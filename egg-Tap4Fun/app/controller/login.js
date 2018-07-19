@@ -11,17 +11,21 @@ const Controller = require('egg').Controller;
 class LoginController extends Controller{
     async index(){
         let phone=this.ctx.params.phone
-        let password=this.ctx.params.passwordß
+        let password=this.ctx.params.password
         const userInfo = await this.app.mysql.get('userInfo', { phone:phone });
 
-        //如果用户输入合法且存在，返回1， 反之0
+        /*
+        *账号正确    密码正确   返回1
+        *账号正确    密码错误   返回2
+        *账号不存在            返回3
+        */
         let stateCode=1
         if(userInfo==null){
-            stateCode=0
+            stateCode=3
         }else {
             let userPassword=userInfo.password
             if(userPassword!=password){
-                stateCode=0
+                stateCode=2
             }
         }
 
@@ -29,23 +33,5 @@ class LoginController extends Controller{
         this.ctx.body=stateCode;
     }
 }
-
-//connect to MySQL database server
-// let mysql =  require("mysql");
-// let connection = mysql.createConnection({
-//     host     : 'localhost',
-//     user     : 'root',
-//     password : '11111111',
-//     database : 'tap4fun'
-// });
-// connection.connect(function(err) {
-//     if (err) {
-//         return console.error('error: ' + err.message);
-//     }
-//
-//     console.log('Connected to the MySQL server.');
-// });
-
-
 
 module.exports = LoginController;
