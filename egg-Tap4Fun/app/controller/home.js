@@ -14,12 +14,25 @@ let smsClient = new SMSClient({accessKeyId, secretAccessKey})
 
 class HomeController extends Controller {
   async index() {
-      const post = await this.app.mysql.get('test', { name:'aaa' });
+      //读取用户手机号
+      let inputPhone=this.ctx.params.phone
+
+      //创造五位随机数验证码
+      var code = require('random-number');
+      var options = {
+          min: 1000,
+          max: 9999,
+          integer:true
+      }
+      code = code(options)
+      console.log('CODE==>>',code)
+
       smsClient.sendSMS({
-          PhoneNumbers: '13551239822',
+          PhoneNumbers: inputPhone,
           SignName: '余亚希',
           TemplateCode: 'SMS_139935233',
-          TemplateParam: '{"code":"12345"}'
+          // TemplateParam: '{"code":"12345"}'
+          TemplateParam: `{"code":${code}}`
       }).then(function (res) {
           let {Code}=res
           if (Code === 'OK') {
@@ -29,8 +42,8 @@ class HomeController extends Controller {
       }, function (err) {
           console.log(err)
       })
-      console.log("post===>>>",post)
-    this.ctx.body = post;
+
+    this.ctx.body = "input phone number is: "+ inputPhone;
   }
 }
 
