@@ -27,24 +27,26 @@ class HomeController extends Controller {
       code = code(options)
       console.log('CODE==>>',code)
 
-      smsClient.sendSMS({
-          PhoneNumbers: inputPhone,
-          SignName: '余亚希',
-          TemplateCode: 'SMS_139935233',
-          // TemplateParam: '{"code":"12345"}'
-          TemplateParam: `{"code":${code}}`
-      }).then(function (res) {
-          let {Code}=res
-          if (Code === 'OK') {
-              //处理返回参数
-              console.log(res)
-          }
-      }, function (err) {
-          console.log(err)
-      })
+      // smsClient.sendSMS({
+      //     PhoneNumbers: inputPhone,
+      //     SignName: '余亚希',
+      //     TemplateCode: 'SMS_139935233',
+      //     TemplateParam: `{"code":${code}}`
+      // }).then(function (res) {
+      //     let {Code}=res
+      //     if (Code === 'OK') {
+      //         //处理返回参数
+      //         console.log(res)
+      //     }
+      // }, function (err) {
+      //     console.log(err)
+      // })
+
+      //将用户手机号、发送的验证码、发送验证码的时间记入数据库
+      var curTime = new Date().getTime(); //返回距1970年1月1日之间的毫秒数
+      const result = await this.app.mysql.insert('authCode', {phone: inputPhone, testNum:code, time:curTime});
 
     this.ctx.body = "input phone number is: "+ inputPhone;
   }
 }
-
 module.exports = HomeController;
