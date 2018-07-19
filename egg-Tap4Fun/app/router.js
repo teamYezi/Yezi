@@ -7,5 +7,5 @@ module.exports = app => {
   const { router, controller } = app;
   router.get('/:phone', controller.home.index);
   router.get('/login/:phone/:password',controller.login.index);
-  // router.get('/:phone', controller.signup.index);
+  router.get('/signup/:phone/:code/:password',controller.signup.index);
 };
