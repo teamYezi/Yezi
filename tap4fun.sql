@@ -11,11 +11,23 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 19/07/2018 13:32:20
+ Date: 19/07/2018 14:51:45
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for authCode
+-- ----------------------------
+DROP TABLE IF EXISTS `authCode`;
+CREATE TABLE `authCode` (
+  `testNum` int(255) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `count` int(255) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for cmtInfo
