@@ -4,6 +4,13 @@
 * 登录接口Controller
 * */
 
+/*
+*短信验证码正确        返回1
+*短信验证码错误        返回0
+*验证码过期（5分钟）    返回-1
+*/
+
+
 const Controller = require('egg').Controller;
 
 
@@ -16,20 +23,27 @@ class SignController extends Controller{
 
 
         //-------------------检查用户填写的验证码是否正确， 如果正确， 存储用户电话和密码----------------
-        /*
-        *短信验证码正确        返回1
-        *短信验证码错误        返回0
-        */
         let stateCode = 0
         if(preInfo!=null){
-           let preCode = preInfo.id;
-           if(preCode == code){
-               stateCode = 1
-           }
+            //检测验证码是否过期（5分钟）
+            var curTime = new Date().getTime();
+            let preTime = preInfo.time;
+            if((curTime - preTime)/1000 < 300){//验证码未过期
+                let preCode = preInfo.testNum;
+                console.log(preCode)
+                if(preCode == code){
+                    stateCode = 1
+                    //存储电话和密码到用户表
+                    const user = {
+                        phone: phone,
+                        password: password,
+                    };
+                    const newUser = await this.app.mysql.insert('userInfo', user);
+                }
+            }else{//验证码过期了
+                stateCode = -1;
+            }
         }
-
-        // let post={"phone":phone,"password":password};
-
 
         this.ctx.body=stateCode;
     }

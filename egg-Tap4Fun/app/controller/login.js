@@ -5,6 +5,14 @@
 * created by LoveMei 19/7/2018
 * */
 
+/*
+*账号正确    密码正确   返回1
+*账号正确    密码错误   返回2
+*账号不存在            返回3
+*/
+
+
+
 const Controller = require('egg').Controller;
 
 
@@ -14,11 +22,7 @@ class LoginController extends Controller{
         let password=this.ctx.params.password
         const userInfo = await this.app.mysql.get('userInfo', { phone:phone });
 
-        /*
-        *账号正确    密码正确   返回1
-        *账号正确    密码错误   返回2
-        *账号不存在            返回3
-        */
+
         let stateCode=1
         if(userInfo==null){
             stateCode=3
