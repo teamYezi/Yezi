@@ -11,31 +11,27 @@ class SignController extends Controller{
     async index(){
         let phone=this.ctx.params.phone;
         let code=this.ctx.params.code;
-        let password=this.ctx.params.passwordß
-        const precode = await this.app.mysql.select('authCode',{
-            where: { phone: phone },
-            orders: [['count','desc']],
-            limit: 1,
-            offset: 0
-        });
+        let password=this.ctx.params.password;
+        const preInfo = await this.app.mysql.get('authCode', {id: phone});
 
+
+        //-------------------检查用户填写的验证码是否正确， 如果正确， 存储用户电话和密码----------------
         /*
-        *账号正确    密码正确   返回1
-        *账号正确    密码错误   返回2
-        *账号不存在            返回3
+        *短信验证码正确        返回1
+        *短信验证码错误        返回0
         */
-        // let stateCode=1
-        // if(userInfo==null){
-        //     stateCode=3
-        // }else {
-        //     let userPassword=userInfo.password
-        //     if(userPassword!=password){
-        //         stateCode=2
-        //     }
-        // }
+        let stateCode = 0
+        if(preInfo!=null){
+           let preCode = preInfo.id;
+           if(preCode == code){
+               stateCode = 1
+           }
+        }
 
         // let post={"phone":phone,"password":password};
-        this.ctx.body=precode;
+
+
+        this.ctx.body=stateCode;
     }
 }
 

@@ -7,7 +7,8 @@
     "@alicloud/sms-sdk": "^1.1.2",
     "egg": "^2.2.1",
     "egg-mysql": "^3.0.0",
-    "egg-scripts": "^2.5.0"
+    "egg-scripts": "^2.5.0",
+    "random-number": "0.0.9"
   },
   "devDependencies": {
     "autod": "^3.0.1",

@@ -42,9 +42,23 @@ class HomeController extends Controller {
       //     console.log(err)
       // })
 
-      //将用户手机号、发送的验证码、发送验证码的时间记入数据库
+      //--------------------------将用户手机号、发送的验证码、发送验证码的时间记入数据库-----------------------------
       var curTime = new Date().getTime(); //返回距1970年1月1日之间的毫秒数
-      const result = await this.app.mysql.insert('authCode', {phone: inputPhone, testNum:code, time:curTime});
+
+      const user = {
+          testNum: code,
+          time: curTime,
+          id: inputPhone,
+      };
+
+      //检测此用户是否已申请过验证码
+      const userExist = await this.app.mysql.get('authCode', { id:inputPhone });
+      if(userExist==null){
+          const result = await this.app.mysql.insert('authCode', user);
+      }else {
+          const result1 = await this.app.mysql.update('authCode', user);
+      }
+
 
     this.ctx.body = "input phone number is: "+ inputPhone;
   }
