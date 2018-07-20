@@ -35,7 +35,7 @@ class SignController extends Controller{
                     stateCode = 1
                     //存储电话和密码到用户表
                     const user = {
-                        phone: phone,
+                        id: phone,
                         password: password,
                     };
                     const newUser = await this.app.mysql.insert('userInfo', user);

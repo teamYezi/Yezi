@@ -20,7 +20,7 @@ class LoginController extends Controller{
     async index(){
         let phone=this.ctx.params.phone
         let password=this.ctx.params.password
-        const userInfo = await this.app.mysql.get('userInfo', { phone:phone });
+        const userInfo = await this.app.mysql.get('userInfo', { id:phone });
 
 
         let stateCode=1
@@ -33,7 +33,6 @@ class LoginController extends Controller{
             }
         }
 
-        // let post={"phone":phone,"password":password};
         this.ctx.body=stateCode;
     }
 }
