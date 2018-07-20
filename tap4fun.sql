@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 19/07/2018 14:51:45
+ Date: 20/07/2018 10:20:57
 */
 
 SET NAMES utf8mb4;
@@ -22,12 +22,19 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `authCode`;
 CREATE TABLE `authCode` (
-  `testNum` int(255) DEFAULT NULL,
-  `time` datetime DEFAULT NULL,
-  `phone` varchar(255) DEFAULT NULL,
-  `count` int(255) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`count`)
+  `testNum` int(255) NOT NULL,
+  `time` varchar(255) NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of authCode
+-- ----------------------------
+BEGIN;
+INSERT INTO `authCode` VALUES (8306, '1532052350578', '13548451165');
+INSERT INTO `authCode` VALUES (7555, '1532052338573', '13551239822');
+COMMIT;
 
 -- ----------------------------
 -- Table structure for cmtInfo
