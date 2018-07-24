@@ -10,20 +10,17 @@
 *账号正确    密码错误   返回2
 *账号不存在            返回3
 */
-
-
-
 const Controller = require('egg').Controller;
-
 
 class LoginController extends Controller{
     async index(){
-        let phone=this.ctx.params.phone
-        let password=this.ctx.params.password
+        const query=this.ctx.query;
+        console.log(query)
+        let phone=query.phone;
+        let password=query.password;
         const userInfo = await this.app.mysql.get('userInfo', { id:phone });
 
-
-        let stateCode=1
+        let stateCode=1;
         if(userInfo==null){
             stateCode=3
         }else {

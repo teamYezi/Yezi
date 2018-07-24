@@ -16,9 +16,10 @@ const Controller = require('egg').Controller;
 
 class SignController extends Controller{
     async index(){
-        let phone=this.ctx.params.phone;
-        let code=this.ctx.params.code;
-        let password=this.ctx.params.password;
+        const query=this.ctx.query;
+        let phone=query.phone;
+        let code=query.code;
+        let password=query.password;
         const preInfo = await this.app.mysql.get('authCode', {id: phone});
 
 
@@ -33,10 +34,11 @@ class SignController extends Controller{
                 console.log(preCode)
                 if(preCode == code){
                     stateCode = 1
-                    //存储电话和密码到用户表
+                    //存储电话和密码到用户表, 初始作品上传数为0
                     const user = {
                         id: phone,
                         password: password,
+                        imgNum: 0,
                     };
                     const newUser = await this.app.mysql.insert('userInfo', user);
                 }
