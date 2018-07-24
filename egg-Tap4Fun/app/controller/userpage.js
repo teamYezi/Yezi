@@ -11,8 +11,9 @@ const Controller = require('egg').Controller;
 
 class userpageController extends Controller{
     async index(){
-        let selfID=this.ctx.params.selfID;
-        let targetID=this.ctx.params.targetID;
+        const query = this.ctx.query;
+        let selfID=query.selfID;
+        let targetID=query.targetID;
 
         //对象用户头像id
         let avatar = null;

@@ -4,9 +4,6 @@
 * 更改个人信息Controller
 */
 
-/*
-* 返回头像ID, 头像id = 电话号
-*/
 
 
 const Controller = require('egg').Controller;
@@ -17,36 +14,50 @@ const path = require('path');
 
 class personInfoController extends Controller{
     async index(){
-        //-----------------/personInfo/:postfix/:name/:gender/:birthday/:signature/:id
-        let postfix = this.ctx.params.postfix;
-        console.log('aaaaaaaaaaaa', postfix);
-        let name = this.ctx.params.name;
-        let gender = this.ctx.params.gender;
-        let birthday = this.ctx.params.birthday;
-        let signature = this.ctx.params.signature;
-        let id = this.ctx.params.id;//手机号
+        const query = this.ctx.query;
+        let postfix = query.postfix;
+        let name = query.name;
+        let gender = query.gender;
+        let birthday = query.birthday;
+        let signature = query.signature;
+        let id = query.id;//手机号
 
         const preInfo = await this.app.mysql.get('userInfo', {id: id});
 
         //------------------------------存储或更新个人资料------------------------------------
         if(preInfo!=null){
+            var curTime = new Date().getTime();
+            let avatar = curTime + postfix;
+            let avatarFull = "http://pc9byzxgk.bkt.clouddn.com/"+curTime + postfix;
+            if(postfix=="null"){
+                avatar = null;
+                avatarFull = null;
+            }
             //昵称， 性别， 生日， 个人标签
             const user = {
+                avatar: avatarFull,
                 name: name,
                 gender: gender,
                 birthday: birthday,
                 signature: signature,
                 id: id,
-                avatar: id,
             };
-
+            //存入数据库
             const updatedUser = await this.app.mysql.update('userInfo', user);
+            //返回给前端
+            const userReturn = {
+                avatar: avatar,
+                name: name,
+                gender: gender,
+                birthday: birthday,
+                signature: signature,
+                id: id,
+            };
+            this.ctx.body=userReturn;
 
         }else{
             console.log('此用户不存在，存储用户信息出错')
         }
-
-        this.ctx.body=id;
     }
     async getInfo(){
         const query = this.ctx.query;
