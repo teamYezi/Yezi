@@ -21,16 +21,41 @@ module.exports = app => {
     router.get('/login',controller.login.index);
 
     //------------------------------------------首页推荐------------------------------------------------
-    //首页推荐界面------------*返回所有图片的（图片URL+作者名字+作者头像+发布日期+评论数+点赞数）
-    //phone
+    //首页推荐界面------------*返回所有图片的（图片URL+图片id+图片描述+作者名字+作者头像+发布日期+评论数+点赞数+是否为这个作品点过赞(点过1没点过-1)） 按点赞数排序 + 下一页页码
+    //phone, page
     router.get('/mainpage', controller.mainpage.index);
+
+    //点赞和取消赞------------*返回"点赞成功"或者"取消赞成功"
+    //id, phone
+    router.get('/likeOrUnlike', controller.mainpage.likeOrUnlike);
+
+    //TODO 等界面出来
     //搜索-----------------
+    //input
+    //旅拍 单色 冷淡 清新 文艺 色感 瞬间 空气 元气 远方
+    router.get('/search', controller.mainpage.search);
 
+    //图片详情
+    //id, phone
+    router.get('/imgDetail', controller.mainpage.imgDetail);
 
+    //TODO 做评论的分页
+    //图片详情 -> 评论展开
+    //id, phone
+    //router.get('/imgDetail', controller.mainpage.imgDetail);
 
+    //TODO 做分页
+    //他人用户信息界面-------------------*返回对象用户头像id， 关注人数， 粉丝人数， 是否已关注此人（是1否-1），所有作品的id和url
+    //selfID, targetID, page
+    router.get('/userpage',controller.userpage.index);
 
+    //他人用户信息界面(关注和取关)---------已关注则取关， 未关注则关注
+    //selfID,targetID
+    router.get('/follow',controller.userpage.follow);
 
     //------------------------------------------首页发现------------------------------------------------
+    //商城首页--------*1.返回广告图片URL 2.每类图片的URL, id, 价格
+    router.get('/store', controller.store.index);
 
 
 
@@ -45,20 +70,25 @@ module.exports = app => {
 
 
     //--------------------------------------------我的--------------------------------------------------
-    //更改用户信息--------*返回用户所有信息
+    //更改自己的用户信息
     // postfix, name, gender, birthday, signature, id
     router.get('/personInfo',controller.personInfo.index);
 
-    // 进入编辑资料页面 获取用户信息-----------------*返回此用户所有信息
+    // 获取用户信息---------------*返回此用户所有信息
     //phone
     router.get('/getpersonInfo',controller.personInfo.getInfo);
 
-    //TODO（所有作品的id）
-    //用户信息界面-------------------*返回对象用户头像id， 关注人数， 粉丝人数， 是否已关注此人（是1否-1），所有作品的id
-    //selfID, targetID
-    router.get('/userpage',controller.userpage.index);
+    //'我的'主界面-------------*返回我的头像， 名字， 签名， 作品数， 关注的人数， 粉丝的人数
+    //phone
+    router.get('/myInfo',controller.my.index);
 
-    //用户信息界面(关注和取关)---------已关注则取关， 未关注则关注
-    //selfID,targetID
-    router.get('/follow',controller.userpage.follow);
+    //TODO 这也要分页啊啊啊啊
+    //'我的'->'作品'->'已发布'-------------*返回已发布的所有头像URL， 头像id
+    //phone
+    // router.get('/myImg/published',controller.my.index);
+
+    //TODO 这也要分页啊啊啊啊
+    //'我的'->'作品'->'待审核'-------------*返回待审核的所有头像URL， 头像id
+    //phone
+
 };

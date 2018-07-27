@@ -7,6 +7,8 @@
 /*
 *返回对象用户头像id， 关注人数， 粉丝人数， 是否已关注此人（是1否-1），所有作品的id
 */
+// import {paging} from "./mainpage";
+
 const Controller = require('egg').Controller;
 
 class userpageController extends Controller{
@@ -14,6 +16,7 @@ class userpageController extends Controller{
         const query = this.ctx.query;
         let selfID=query.selfID;
         let targetID=query.targetID;
+        let page = query.page;
 
         //对象用户头像id
         let avatar = null;
@@ -52,22 +55,18 @@ class userpageController extends Controller{
             followed = -1;
         }
 
-        //对象用户的所有的作品id
-        //TODO
-        const targetImages = await this.app.mysql.get('imgInfo', {phone: targetID});
-
+        //对象用户的所有的作品id和URL
+        const targetImages = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${targetID}`);
+        let targetimg = 1;
+        console.log(targetimg);
         let data= {
-            "avatar id":avatar,
+            "avatar":avatar,
             "following": following,
             "fans": fans,
-            "imgID":"",
-            "followed":followed
+            "followed":followed,
+            "imagesInfo": targetimg,
         };
 
-        // let srv = http.createServer(function (req, res) {
-        //     res.writeHead(200, {'Content-Type': 'application/json'});
-        //     res.end(JSON.stringify(data));
-        // });
         this.ctx.body=data;
     }
 
