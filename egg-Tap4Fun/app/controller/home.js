@@ -1,12 +1,7 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-const SMSClient = require('@alicloud/sms-sdk')
-
-/*
-    短信推送的key
-    created by LoveMei 7/19/2018
-*/
+const SMSClient = require('@alicloud/sms-sdk');
 
 /*
    1 -----发送成功
@@ -15,10 +10,10 @@ const SMSClient = require('@alicloud/sms-sdk')
 const accessKeyId = 'LTAIWsNF0xRDTygR'
 const secretAccessKey = 'DNcw97wsNRTYi7UjdYz0vFIOt2R6r9'
 
-let smsClient = new SMSClient({accessKeyId, secretAccessKey})
+let smsClient = new SMSClient({accessKeyId, secretAccessKey});
 
 class HomeController extends Controller {
-  async index() {
+    async index() {
       let status=1
       //读取用户手机号
       const query=this.ctx.query;
@@ -73,5 +68,56 @@ class HomeController extends Controller {
 
     this.ctx.body = status;
   }
+
+    async signup(){
+        const query=this.ctx.query;
+        let phone=query.phone;
+        let code=query.code;
+        let password=query.password;
+        const preInfo = await this.app.mysql.get('authCode', {id: phone});
+        //-------------------检查用户填写的验证码是否正确， 如果正确， 存储用户电话和密码----------------
+        let stateCode = 0
+        if(preInfo!=null){
+            //检测验证码是否过期（5分钟）
+            var curTime = new Date().getTime();
+            let preTime = preInfo.time;
+            if((curTime - preTime)/1000 < 300){//验证码未过期
+                let preCode = preInfo.testNum;
+                console.log(preCode)
+                if(preCode == code){
+                    stateCode = 1
+                    //存储电话和密码到用户表, 初始作品上传数为0
+                    const user = {
+                        id: phone,
+                        password: password,
+                        imgNum: 0,
+                    };
+                    const newUser = await this.app.mysql.insert('userInfo', user);
+                }
+            }else{//验证码过期了
+                stateCode = -1;
+            }
+        }
+        this.ctx.body=stateCode;
+    }
+
+    async login(){
+        const query=this.ctx.query;
+        console.log(query)
+        let phone=query.phone;
+        let password=query.password;
+        const userInfo = await this.app.mysql.get('userInfo', { id:phone });
+
+        let stateCode=1;
+        if(userInfo==null){
+            stateCode=3
+        }else {
+            let userPassword=userInfo.password
+            if(userPassword!=password){
+                stateCode=2
+            }
+        }
+        this.ctx.body=stateCode;
+    }
 }
 module.exports = HomeController;

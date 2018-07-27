@@ -29,6 +29,7 @@ function convertTags(tag){
         default:return 'other';
     }
 }
+
 class mainpageController extends Controller{
 
     //返回所有图片的（图片URL+图片id+图片描述+作者名字+作者头像+发布日期+评论数+点赞数+是否为这个作品点过赞(点过1没点过-1)） 按点赞数排序
@@ -36,10 +37,10 @@ class mainpageController extends Controller{
         const query=this.ctx.query;
         let phone = query.phone;
         let page = query.page;
-        //读取三个表的数据
-        const images = await this.app.mysql.select('imgInfo',{
-            orders:[['likes', 'desc']],
-        });
+
+
+        const images = await this.app.mysql.query('select * from imgInfo where status=1 order by likes desc');
+
         var result = [];
         for (var i = 0; i< images.length; i++){
             const name = (await this.app.mysql.get('userInfo', { id:images[i].phone})).name;
@@ -65,9 +66,9 @@ class mainpageController extends Controller{
             };
             result[i]=eachImg;
         }
+
         this.ctx.body=paging(page, result);
     }
-
 
     //点赞或取消赞
     //返回描述
@@ -108,15 +109,12 @@ class mainpageController extends Controller{
         this.ctx.body = message;
     }
 
-
     //返回当前图片的URL，
-    async search(){
-        const query = this.ctx.query;
-        let input = query.input;  //用户输入的关键词
-
-        this.ctx.body = "图片信息界面";
-    }
-
+    // async search(){
+    //     const query = this.ctx.query;
+    //     let input = query.input;  //用户输入的关键词
+    //     this.ctx.body = "图片信息界面";
+    // }
 
     //返回
     //图片的URL，图片名字，图片id， 图片标签， 作者头像， 作者名字， 作者签名， 图片描述， 发布日期
@@ -224,7 +222,6 @@ class mainpageController extends Controller{
             return num;
         }
     }
-
-
 }
+
 module.exports = mainpageController;
