@@ -1,6 +1,6 @@
 'use strict';
 
-const Controller = require('egg').Controller;
+const Controller = require('./my');
 
 class storeController extends Controller {
     async index() {
@@ -84,6 +84,45 @@ class storeController extends Controller {
         result[10] = {"name": "远方", "value": yf};
 
         this.ctx.body = result;
+    }
+
+    async cate() {
+        let result = [];
+        const query = this.ctx.query;
+        let cate=query.cate;//e.g. 'danse'
+        let page = query.page;
+
+        const all = await this.app.mysql.query(`select id from imgTag where ${cate} = 1`);
+        for (var i =0; i< all.length; i++){
+            //图片id
+            let id = all[i].id;
+            let image = await this.app.mysql.get('imgInfo', {id: id});
+            if (image === null){
+                this.ctx.body = `ERROR: 图片不存在， id：${id}`;
+                return;
+            }else{
+                //图片url
+                let url = image.imgURL;
+                //图片名字
+                let img_name = image.imgName;
+                //作者名字
+                let auth_name = (await this.app.mysql.get('userInfo', {id: image.phone})).name;
+                //图片价格
+                let price = image.price;
+                let imageInfo = {
+                    "imgID": image.id,
+                    "imgURL": url,
+                    "imgName": img_name,
+                    "author_name": auth_name,
+                    "price": price,
+                }
+                result[i] = imageInfo;
+            }
+        }
+
+        result = this.paging(page, result, 12);
+        this.ctx.body = result;
+
     }
 }
 module.exports = storeController;

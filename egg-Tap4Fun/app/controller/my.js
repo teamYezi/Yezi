@@ -1,12 +1,28 @@
 'use strict'
 
-const Controller = require('egg').Controller;
-
-function paging(pageNum, arr, num){
-    return(arr.slice((pageNum-1)*num, (pageNum)*num));
-}
+const {Controller} = require('egg');
 
 class myController extends Controller{
+    paging(pageNum, arr, num){
+        return(arr.slice((pageNum-1)*num, (pageNum)*num));
+    }
+
+    convertTags(tag){
+        switch (tag){
+            case 'lvpai':return "旅拍";
+            case 'danse':return "单色";
+            case 'lengdan': return "冷淡";
+            case 'qingxin': return "清新";
+            case 'wenyi': return "文艺";
+            case 'segan': return "色感";
+            case 'shunjian': return "瞬间";
+            case 'kongqi': return "空气";
+            case 'yuanqi': return "元气";
+            case 'yuanfang': return "远方";
+            default:return 'other';
+        }
+    }
+
     //返回我的头像， 名字， 签名， 作品数， 关注的人数， 粉丝的人数
     async index(){
         const query=this.ctx.query;
@@ -31,7 +47,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let publishedImg = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${phone} and status = 1`);
-        publishedImg = paging(page, publishedImg, 15);
+        publishedImg = this.paging(page, publishedImg, 15);
         this.ctx.body=publishedImg;
     }
 
@@ -41,7 +57,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let pendingImg = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${phone} and status = 0`);
-        pendingImg = paging(page, pendingImg, 15);
+        pendingImg = this.paging(page, pendingImg, 15);
         this.ctx.body=pendingImg;
     }
 
@@ -51,7 +67,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let followedUser = await this.app.mysql.query(`select avatar, name, signature, id from userInfo where id in (select followed_user from follow where user_id = ${phone})`);
-        followedUser = paging(page, followedUser, 30);
+        followedUser = this.paging(page, followedUser, 30);
         this.ctx.body = followedUser;
     }
 
@@ -67,7 +83,7 @@ class myController extends Controller{
             let followBack = await this.app.mysql.query(`select * from follow where user_id = ${phone} and followed_user = ${fans[i].id}`);
             let follow_back = 1;
             if(followBack.length === 0){//没有回粉
-               follow_back = 0;
+                follow_back = 0;
             }
             data[i]={
                 "avatar": fans[i].avatar,
@@ -78,11 +94,8 @@ class myController extends Controller{
             };
 
         }
-
-
-        fans = paging(page, fans, 30);
+        data = this.paging(page, data, 30);
         this.ctx.body = data;
     }
 }
-
 module.exports = myController;

@@ -4,16 +4,7 @@
 * 更改个人信息Controller
 */
 
-const Controller = require('egg').Controller;
-// const Service = require('egg').Service;
-// const fs = require('fs');
-// const path = require('path');
-
-
-function paging(pageNum, arr){
-    return(arr.slice((pageNum-1)*15, (pageNum)*15));
-}
-
+const Controller = require('./my');
 
 class personInfoController extends Controller{
     async index(){
@@ -115,7 +106,7 @@ class personInfoController extends Controller{
 
         //对象用户的所有的作品id和URL
         const targetImages = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${targetID} and status = 1`);
-        let targetimg = paging(page, targetImages);
+        let targetimg = this.paging(page, targetImages, 15);
 
         let data= {
             "avatar":avatar,

@@ -4,30 +4,16 @@
 * 首页推荐Controller
 * */
 
-/*
-*
-*/
-const Controller = require('egg').Controller;
+const Controller = require('./my');
 
-
-function paging(pageNum, arr){
-    return(arr.slice((pageNum-1)*10, (pageNum)*10));
-}
-
-function convertTags(tag){
-    switch (tag){
-        case 'lvpai':return "旅拍";
-        case 'danse':return "单色";
-        case 'lengdan': return "冷淡";
-        case 'qingxin': return "清新";
-        case 'wenyi': return "文艺";
-        case 'segan': return "色感";
-        case 'shunjian': return "瞬间";
-        case 'kongqi': return "空气";
-        case 'yuanqi': return "元气";
-        case 'yuanfang': return "远方";
-        default:return 'other';
+function build_order_no(){
+    var outTradeNo="";
+    for(var i=0;i<6;i++)
+    {
+        outTradeNo += Math.floor(Math.random()*10);
     }
+    outTradeNo = new Date().getTime() + outTradeNo;
+    return outTradeNo;
 }
 
 class mainpageController extends Controller{
@@ -66,12 +52,11 @@ class mainpageController extends Controller{
             };
             result[i]=eachImg;
         }
-
-        this.ctx.body=paging(page, result);
+        // console.log(this.convertTags('fjdksjf'));
+        this.ctx.body=this.paging(page, result, 10);
     }
 
     //点赞或取消赞
-    //返回描述
     async likeOrUnlike(){
         const query=this.ctx.query;
         let id = query.id;//这张图的id
@@ -121,10 +106,11 @@ class mainpageController extends Controller{
     //图片价格， 评论数， 点赞数
     //3条以内评论（评论人名字，头像URL， 评论发布日期， 评论内容 ） + 评论总数量
     //有没有对此作品点赞 （点过赞了返回1 没点过赞返回-1）
+    //自己的头像
     async imgDetail(){
         const query = this.ctx.query;
-        let id = query.id;
-        let inputphone = query.phone;
+        let id = query.id;//图片的id
+        let inputphone = query.phone;//本人的电话
 
         const img = await this.app.mysql.get('imgInfo', {id:id});
         //图片URL
@@ -137,9 +123,9 @@ class mainpageController extends Controller{
         let tags = await this.app.mysql.query(`select * from imgTag where id = ${id}`);
         let data=[];
         tags=tags[0];
-        Object.keys(tags).forEach(function(key){
+        Object.keys(tags).forEach((key)=>{
             if(tags[key]===1){
-                data.push(convertTags(key))
+                data.push(this.convertTags(key));
             }
         });
         //图片描述
@@ -193,6 +179,9 @@ class mainpageController extends Controller{
         if(lon != null){
             likedornot = 1;
         }
+        // 本人头像
+        const myAvatar = (await this.app.mysql.get('userInfo', {id: inputphone})).avatar;
+
 
         let result = {
             "imgURL": imgURL,
@@ -211,6 +200,7 @@ class mainpageController extends Controller{
             "image_resolution": imgResolution,
             "image_type": imgType,
             "comments": cmts,
+            "my_avatar": myAvatar,
         }
         this.ctx.body = result;
 
@@ -221,6 +211,59 @@ class mainpageController extends Controller{
             }
             return num;
         }
+    }
+
+    async pay(){
+        const query = this.ctx.query;
+        let id = query.id;//图片id
+        let inputPhone = query.phone;//我的手机号
+
+        //生成一个订单号
+        let order_number = build_order_no();
+        //作品名字
+        const image = await this.app.mysql.get('imgInfo', {id: id});
+        let seller_phone = image.phone;
+        let image_name = image.imgName;
+        //作品id
+
+        let image_id = image.id;
+        //作品价格
+        let image_price = image.price;
+
+        let data = {
+            "order_number": order_number,
+            "image_name": image_name,
+            "image_id": image_id,
+            "image_price": image_price,
+        };
+        const store_info = await this.app.mysql.insert('orders', {order_number: order_number, buyer_phone: inputPhone, seller_phone: seller_phone, status: '0', imgID: id});
+
+        this.ctx.body = data;
+
+    }
+
+    //如果这个作品没有被购买过，且不在购物车内，可以加入购物车  (待付款可以加购物车)
+    async add2cart(){
+        let status = '';
+        const query = this.ctx.query;
+        let id = query.id;//图片id
+        let inputPhone = query.phone;//我的手机号
+        const purchased = await this.app.mysql.get('orders', {imgID: id, buyer_phone: inputPhone, status: 1});
+        //没有购买记录
+        if (purchased === null){
+            //购物车里也没有这个图片
+            const cart = await this.app.mysql.get('shoppingCart', {phone:inputPhone, imgID: id});
+            if (cart === null){
+                //加入购物车
+                status = '加入购物车成功';
+                const add = await this.app.mysql.insert('shoppingCart', {phone: inputPhone, imgID: id});
+            }else{
+                status = '购物车已存在此作品，无法加入购物车';
+            }
+        }else{
+            status = '用户已购买， 无法加入购物车';
+        }
+        this.ctx.body = status;
     }
 }
 

@@ -4,9 +4,9 @@
  * @param {Egg.Application} app - egg application
  * 输入格式e.g.： http://127.0.0.1:7001/?phone=egg&name=chloe
  */
+
 module.exports = app => {
     const { router, controller } = app;
-
     //------------------------------------------基础功能------------------------------------------------
     //发送验证短信---------*发送成功返回1 *已注册返回-1
     //phone
@@ -39,15 +39,32 @@ module.exports = app => {
     //id, phone
     router.get('/imgDetail', controller.mainpage.imgDetail);
 
+    //图片详情 -> 加入购物车
+    //id, phone (图片id+本人电话)
+    router.get('/imgDetail/add2cart', controller.mainpage.add2cart);
+
+    //图片详情 -> 立即购买
+    //id, phone (图片id+本人电话)
+    router.get('/imgDetail/pay', controller.mainpage.pay);
+
     //TODO 做评论的分页
     //图片详情 -> 评论展开
     //id, phone
     //router.get('/imgDetail', controller.mainpage.imgDetail);
 
+    //TODO 图片详情的转发界面
+
     //------------------------------------------首页发现------------------------------------------------
     //商城首页--------*1.返回广告图片URL 2.每类图片的URL, id, 价格
     router.get('/store', controller.store.index);
 
+    //商城分类---------*返回此类别每张图片的URL, 图片名字， 图片id， 价格
+    //cate, page (图片类别, 页码)
+    router.get('/store/cate', controller.store.cate);
+
+    //TODO： 商城的搜索
+
+    //TODO: 右上角的购物车界面
 
     //------------------------------------------版权上传------------------------------------------------
     //TODO
@@ -90,7 +107,16 @@ module.exports = app => {
     //phone, page
     router.get('/myImg/follow', controller.my.follow);
 
+    //TODO 关注人的搜索
+
     //'我的'->'粉丝'-------------*返回粉丝的头像， 名字， 签名， 是否有关注这个粉丝（关注了1，没关注0）
     //phone, page
     router.get('/myImg/fans', controller.my.fans);
+
+    //TODO 粉丝的搜索
+
+    //关注和取消关注------------*返回"点赞成功"或者"取消赞成功"
+    //id, phone
+    // router.get('/likeOrUnlike', controller.mainpage.likeOrUnlike);
+
 };
