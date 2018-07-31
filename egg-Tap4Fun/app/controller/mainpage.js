@@ -75,7 +75,7 @@ class mainpageController extends Controller{
             const imgUpdated = {id: id, likes: likes};
             const imgResult = await this.app.mysql.update('imgInfo', imgUpdated);
             //likes表更新
-            const likesUpdated = {phone: phone, imgLikesID: id};
+            const likesUpdated = {phone: phone, imgLikesID: id, time: Date.now()};
             const likesResult = await this.app.mysql.insert('likes', likesUpdated);
             message = "点赞成功";
         }else{//如果已点赞

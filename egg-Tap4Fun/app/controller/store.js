@@ -124,5 +124,31 @@ class storeController extends Controller {
         this.ctx.body = result;
 
     }
+
+    async cart(){
+        const query = this.ctx.query;
+        let inputPhone = query.phone;
+        let page = query.page;
+        let result = [];
+        const images = await this.app.mysql.query(`select imgID from shoppingCart where phone = ${inputPhone}`);
+        for (var i = 0; i<images.length; i++){
+            let imgInfo = (await this.app.mysql.query(`select * from imgInfo where id = ${images[i].imgID}`))[0];
+            // console.log(imgInfo);
+            let img_url = imgInfo.imgURL;
+            // console.log(img_url)
+            let img_name = imgInfo.imgName;
+            let img_price = imgInfo.price;
+            let img = {
+                "image_id": images[i].imgID,
+                "image_url": img_url,
+                "image_name": img_name,
+                "image_price": img_price,
+            };
+            result[i] = img;
+        }
+
+        result = this.paging(page, result, 10);
+        this.ctx.body = result;
+    }
 }
 module.exports = storeController;
