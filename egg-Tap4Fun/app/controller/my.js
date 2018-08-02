@@ -2,6 +2,19 @@
 
 const {Controller} = require('egg');
 
+function noti_type(num){
+    switch(num){
+        case 1: return "版权消息";
+        case 2: return "交易消息";
+        case 3: return "公告";
+        default: return "";
+    }
+}
+
+function isContains(str, substr){
+    return str.indexOf(substr)>=0;
+}
+
 class myController extends Controller{
     paging(pageNum, arr, num){
         return(arr.slice((pageNum-1)*num, (pageNum)*num));
@@ -71,6 +84,25 @@ class myController extends Controller{
         this.ctx.body = followedUser;
     }
 
+    //搜索关注人
+    async followsearch(){
+        const query = this.ctx.query;
+        let input = query.input;
+        let inputPhone = query.phone;
+        let page = query.page;
+        let result = [];
+        let followedUser = await this.app.mysql.query(`select avatar, name, signature, id from userInfo where id in (select followed_user from follow where user_id = ${inputPhone})`);
+        if(followedUser.length>0){
+            for(var i=0; i<followedUser.length; i++){
+                if(isContains(followedUser[i].name, input) === true){
+                    result.push(followedUser[i]);
+                }
+            }
+        }
+        result = this.paging(page, result, 30);
+        this.ctx.body = result;
+    }
+
     //我粉丝的头像, 名字, 签名, 电话号(id), 是否关注对方（是返回1， 不是返回0）
     async fans(){
         const query=this.ctx.query;
@@ -96,6 +128,41 @@ class myController extends Controller{
         }
         data = this.paging(page, data, 30);
         this.ctx.body = data;
+    }
+
+    async fanssearch(){
+        const query=this.ctx.query;
+        let phone = query.phone;
+        let page = query.page;
+        let input = query.input;
+        //所有粉丝
+        let fans = await this.app.mysql.query(`select avatar, name, signature, id from userInfo where id in (select follower from fans where user_id = ${phone})`);
+        let data = [];
+        let result = [];
+        for (var i=0; i<fans.length; i++){
+            let followBack = await this.app.mysql.query(`select * from follow where user_id = ${phone} and followed_user = ${fans[i].id}`);
+            let follow_back = 1;
+            if(followBack.length === 0){//没有回粉
+                follow_back = 0;
+            }
+            data[i]={
+                "avatar": fans[i].avatar,
+                "name": fans[i].name,
+                "signature": fans[i].signature,
+                "id": fans[i].id,
+                "follow_back": follow_back,
+            };
+
+        }
+        if(data.length>0){
+            for(var i=0; i<data.length; i++){
+                if(isContains(data[i].name, input) === true){
+                    result.push(data[i]);
+                }
+            }
+        }
+        result = this.paging(page, result, 30);
+        this.ctx.body = result;
     }
 
     async orders(){
@@ -226,6 +293,7 @@ class myController extends Controller{
         let page = query.page;
         let result = [];
         const all = await this.app.mysql.query(`select * from orders where seller_phone = ${inputPhone} and status = 1 order by order_time desc`);
+        console.log(all);
         if(all.length>0){
             for (var i=0; i<all.length; i++){
                 //购入时间
@@ -268,14 +336,17 @@ class myController extends Controller{
         let inputPhone = query.phone;
         let page  = query.page;
         let result = [];
-        let all = await this.app.mysql.query(`select * from likes where phone = ${inputPhone} order by time asc`);
+        let all = await this.app.mysql.query(`select * from likes where phone = ${inputPhone} order by time desc`);
         if(all.length>0){
             for(var i=0; i<all.length; i++){
                 let img_info = await this.app.mysql.query(`select * from imgInfo where id = ${all[i].imgLikesID}`);
-                // console.log(img_info);
+                let user_phone = (await this.app.mysql.get('imgInfo', {id: all[i].imgLikesID})).phone;
+                let user = await this.app.mysql.get('userInfo', {id: user_phone});
                 let img = {
+                    "name":user.name,
+                    "user_avatar": user.avatar,
                     "time": all[i].time,
-                    "img_name": img_info[0].imgName,
+                    "img_description": img_info[0].description,
                     "img_id": img_info[0].id,
                     "img_url": img_info[0].imgURL,
                 };
@@ -318,8 +389,38 @@ class myController extends Controller{
                 let info = {
                     "user_name": user.name,
                     "user_avatar": user.avatar,
+                    "user_id": user.id,
                     "time": all[i].time,
                     "img_url": image.imgURL,
+                    "img_id":image.id,
+                };
+                result.push(info);
+            }
+        }
+        result = this.paging(page, result, 10);
+        this.ctx.body = result;
+    }
+
+    async cmtmessage() {
+        const query = this.ctx.query;
+        let inputPhone = query.phone;
+        let page = query.page;
+        let result = [];
+        //评论人头像，名字，评论时间，评论内容，我的作品url，作品描述。按时间排序
+        const all = await this.app.mysql.query(`select * from cmtInfo where imgID in (select id from imgInfo where phone = ${inputPhone} order by pubdate desc)`);
+        if(all.length>0){
+            for(var i=0; i<all.length; i++){
+                const user = await this.app.mysql.get('userInfo', {id:all[i].phone});//评论人的信息
+                const img = await this.app.mysql.get('imgInfo', {id: all[i].imgID});
+                let info = {
+                    "user_avatar": user.avatar,
+                    "user_name": user.name,
+                    "user_id": user.id,
+                    "cmt_time": all[i].pubdate,
+                    "comment": all[i].comment,
+                    "img_url": img.imgURL,
+                    "img_id": img.id,
+                    "img_description": img.description,
                 }
                 result.push(info);
             }
@@ -328,5 +429,26 @@ class myController extends Controller{
         this.ctx.body = result;
     }
 
+    async notification() {
+        const query = this.ctx.query;
+        let inputPhone = query.phone;
+        let page = query.page;
+        let result = [];
+        const all = await this.app.mysql.query(`select * from notification where phone = ${inputPhone} order by time desc`);
+        if(all.length>0){
+            for(var i=0; i<all.length; i++){
+                let noti = {
+                    "avatar_url": 'http://pc9byzxgk.bkt.clouddn.com/LOGO.jpg',
+                    "notification_type": noti_type(all[i].type),
+                    "time": all[i].time,
+                    "content": all[i].content,
+                }
+                result.push(noti);
+            }
+        }
+
+        result = this.paging(page, result, 10);
+        this.ctx.body = result;
+    }
 }
 module.exports = myController;

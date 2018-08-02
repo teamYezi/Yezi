@@ -75,9 +75,13 @@ module.exports = app => {
 
     //------------------------------------------版权上传------------------------------------------------
     //TODO
-    //上传图片 创建图片id
-    // router.get('/uploadImg/:phone',controller.uploadImg.index);
+    //上传作品图
+    router.get('/uploadImg',controller.uploadimg.index);
 
+    //上传源文件
+    router.get('/uploadRaw',controller.uploadimg.raw);
+
+    //编辑作品资料
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
@@ -111,7 +115,9 @@ module.exports = app => {
     //phone, page
     router.get('/myImg/follow', controller.my.follow);
 
-    //TODO 关注人的搜索
+    //我的->搜索关注人
+    //phone, input, page
+    router.get('/myImg/follow/search', controller.my.followsearch);
 
     //---------------------------我的粉丝------------------------------
     //我的->粉丝
@@ -119,7 +125,9 @@ module.exports = app => {
     //phone, page
     router.get('/myImg/fans', controller.my.fans);
 
-    //TODO 粉丝的搜索
+    //我的—>搜索粉丝
+    //phone, page, input
+    router.get('/myImg/fans/search', controller.my.fanssearch);
 
     //关注和取关
     //selfID,targetID
@@ -150,18 +158,15 @@ module.exports = app => {
 
     //我的消息->评论
     //phone, page
-    //TODO
+    router.get('/mymessage/comments', controller.my.cmtmessage);
 
     //我的消息->通知
     //phone, page
-    //TODO
+    router.get('/mymessage/notification', controller.my.notification);
 
     //---------------------------我赞过的------------------------------
     //我的->我赞过的
     //phone, page
     router.get('/mylikes',controller.my.mylikes);
-
-
-
 
 };
