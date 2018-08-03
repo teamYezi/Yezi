@@ -2,7 +2,18 @@
 
 const Controller = require('./my');
 
+function build_order_no(){
+    var outTradeNo="";
+    for(var i=0;i<6;i++)
+    {
+        outTradeNo += Math.floor(Math.random()*10);
+    }
+    outTradeNo = new Date().getTime() + outTradeNo;
+    return outTradeNo;
+}
+
 class storeController extends Controller {
+    //商城首页
     async index() {
         let result = [];
         //广告信息
@@ -86,6 +97,7 @@ class storeController extends Controller {
         this.ctx.body = result;
     }
 
+    //商城分类
     async cate() {
         let result = [];
         const query = this.ctx.query;
@@ -125,6 +137,7 @@ class storeController extends Controller {
 
     }
 
+    //购物车
     async cart(){
         const query = this.ctx.query;
         let inputPhone = query.phone;
@@ -149,6 +162,36 @@ class storeController extends Controller {
 
         result = this.paging(page, result, 10);
         this.ctx.body = result;
+    }
+
+    //购物车结算
+    async pay(){
+        const query = this.ctx.query;
+        let phone = query.phone;
+        let idlist = query.imgID;
+        console.log(phone);
+        console.log(idlist);
+        //生成一个订单号
+        let order_number = build_order_no();
+        let cur_time = new Date().getTime();
+        if(idlist.length>0){
+            let tags = idlist.split(',');
+            for(var i=0; i<tags.length; i++){
+                //图片信息
+                const img_info = await this.app.mysql.get('imgInfo', {id: tags[i]});
+                let order_per_img = {
+                    order_number: order_number,
+                    buyer_phone: phone,
+                    seller_phone: img_info.phone,
+                    status:0,
+                    order_time: cur_time,
+                    imgID: tags[i],
+                };
+                console.log(order_per_img);
+                const store_order = await this.app.mysql.insert('orders', order_per_img);
+            }
+        }
+        this.ctx.body = 1;
     }
 }
 module.exports = storeController;

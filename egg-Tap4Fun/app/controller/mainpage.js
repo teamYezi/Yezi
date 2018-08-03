@@ -8,8 +8,7 @@ const Controller = require('./my');
 
 function build_order_no(){
     var outTradeNo="";
-    for(var i=0;i<6;i++)
-    {
+    for(var i=0;i<6;i++){
         outTradeNo += Math.floor(Math.random()*10);
     }
     outTradeNo = new Date().getTime() + outTradeNo;
@@ -18,7 +17,7 @@ function build_order_no(){
 
 class mainpageController extends Controller{
 
-    //返回所有图片的（图片URL+图片id+图片描述+作者名字+作者头像+发布日期+评论数+点赞数+是否为这个作品点过赞(点过1没点过-1)） 按点赞数排序
+    //首页推荐界面
     async index(){
         const query=this.ctx.query;
         let phone = query.phone;
@@ -94,19 +93,27 @@ class mainpageController extends Controller{
         this.ctx.body = message;
     }
 
-    //返回当前图片的URL，
-    // async search(){
-    //     const query = this.ctx.query;
-    //     let input = query.input;  //用户输入的关键词
-    //     this.ctx.body = "图片信息界面";
-    // }
+    //添加评论
+    async addcomment(){
+        const query = this.ctx.query;
+        let img_id = query.id;
+        let phone = query.phone;
+        let cmt = query.cmt;
+        //添加评论
+        let cur_time = new Date().getTime();
+        let comment = {
+            imgID: img_id,
+            comment: cmt,
+            phone: phone,
+            pubdate: cur_time,
+        };
+        const add_comment = await this.app.mysql.insert('cmtInfo', comment);
+        //更改评论数
+        const modify_cmt_num = await this.app.mysql.query(`update imgInfo set comments = comments+1 where id=${img_id}`);
+        this.ctx.body = comment;
+    }
 
-    //返回
-    //图片的URL，图片名字，图片id， 图片标签， 作者头像， 作者名字， 作者签名， 图片描述， 发布日期
-    //图片价格， 评论数， 点赞数
-    //3条以内评论（评论人名字，头像URL， 评论发布日期， 评论内容 ） + 评论总数量
-    //有没有对此作品点赞 （点过赞了返回1 没点过赞返回-1）
-    //自己的头像
+    //图片详情
     async imgDetail(){
         const query = this.ctx.query;
         let id = query.id;//图片的id
@@ -173,15 +180,14 @@ class mainpageController extends Controller{
             cmts.push(person);
         }
 
-        // 是否对此图片已点赞
+        //是否对此图片已点赞
         let likedornot = 0;
         const lon = await this.app.mysql.get('likes', {phone:inputphone, imgLikesID:id});
         if(lon != null){
             likedornot = 1;
         }
-        // 本人头像
+        //本人头像
         const myAvatar = (await this.app.mysql.get('userInfo', {id: inputphone})).avatar;
-
 
         let result = {
             "imgURL": imgURL,
@@ -213,6 +219,7 @@ class mainpageController extends Controller{
         }
     }
 
+    //图片详情->立即购买
     async pay(){
         const query = this.ctx.query;
         let id = query.id;//图片id
@@ -264,6 +271,30 @@ class mainpageController extends Controller{
             status = '用户已购买， 无法加入购物车';
         }
         this.ctx.body = status;
+    }
+
+    //评论展开
+    async comments(){
+        const query = this.ctx.query;
+        let img_id = query.id;
+        // let phone = query.phone; //我自己的电话
+        let page = query.page;
+        let result = [];
+        const all = await this.app.mysql.query(`select * from cmtInfo where imgID=${img_id} order by pubdate desc`);
+        for (var i=0; i<all.length; i++){
+            const user = await this.app.mysql.get('userInfo', {id: all[i].phone});
+            let j = {
+                "avatar": user.avatar,
+                "user_name": user.name,
+                "time": all[i].pubdate,
+                "comment": all[i].comment,
+            };
+            result.push(j);
+        }
+
+        result = this.paging(page, result, 10);
+        this.ctx.body = result;
+
     }
 }
 

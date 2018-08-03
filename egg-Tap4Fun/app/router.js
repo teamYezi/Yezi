@@ -18,7 +18,7 @@ module.exports = app => {
     //phone, code, password
     router.get('/signup',controller.home.signup);
 
-    //登录=
+    //登录
     //账号正确密码正确返回1，*账号正确密码错误返回2，*账号不存在返回3
     //phone, password
     router.get('/login',controller.home.login);
@@ -32,7 +32,12 @@ module.exports = app => {
     //id, phone
     router.get('/likeOrUnlike', controller.mainpage.likeOrUnlike);
 
-    //TODO 等界面出来
+    //评论作品
+    //id, phone, cmt(图片id+本人电话+评论内容)
+    router.get('/addcomment', controller.mainpage.addcomment);
+
+
+    //TODO 首页的搜索 等界面出来
     //搜索
     //input
     //旅拍 单色 冷淡 清新 文艺 色感 瞬间 空气 元气 远方
@@ -50,12 +55,9 @@ module.exports = app => {
     //id, phone (图片id+本人电话)
     router.get('/imgDetail/pay', controller.mainpage.pay);
 
-    //TODO 做评论的分页
     //图片详情 -> 评论展开
-    //id, phone
-    //router.get('/imgDetail', controller.mainpage.imgDetail);
-
-    //TODO 图片详情的转发界面
+    //id, page(图片id+页码)
+    router.get('/imgDetail/comments', controller.mainpage.comments);
 
     //------------------------------------------首页发现------------------------------------------------
     //商城首页
@@ -65,23 +67,24 @@ module.exports = app => {
     //cate, page (图片类别, 页码)
     router.get('/store/cate', controller.store.cate);
 
-    //TODO： 商城的搜索
+    //TODO： 商城的搜索 等界面
 
     //商城 -> 购物车
     //phone, page (我的电话号, 页码)
     router.get('/store/cart', controller.store.cart);
 
-
+    //商城 -> 购物车 -> 结算
+    //phone, imgID(我的电话， 要购买的图片的图片id)
+    router.get('/store/pay', controller.store.pay);
 
     //------------------------------------------版权上传------------------------------------------------
-    //TODO
-    //上传作品图
+    //上传作品图, 并且编辑资料
+    //phone, price, imgName, postfix, size, resolution, description, imgTag, ctag
     router.get('/uploadImg',controller.uploadimg.index);
 
     //上传源文件
+    //phone, postfix
     router.get('/uploadRaw',controller.uploadimg.raw);
-
-    //编辑作品资料
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
@@ -168,5 +171,12 @@ module.exports = app => {
     //我的->我赞过的
     //phone, page
     router.get('/mylikes',controller.my.mylikes);
+
+
+    //----------------------------------------其他----------------------------------------------
+    //TODO
+    //模拟的订单支付接口， 钱够直接扣， 不够返回失败信息
+    //order_number
+    router.get('/other/pay', controller.other.index);
 
 };
