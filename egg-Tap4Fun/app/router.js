@@ -90,6 +90,9 @@ module.exports = app => {
     //TODO 上链
     //
     // router.get('/uploadImg', );
+    //https://github.com/nebulasio/neb.js
+    //https://github.com/nebulasio/neb.js/blob/master/example/node-example.js
+    //https://github.com/nebulasio/wiki/blob/master/tutorials/%5B中文%5D%20Nebulas%20101%20-%2002%20发送交易.md
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
@@ -186,5 +189,9 @@ module.exports = app => {
     //模拟的充值接口
     //phone, rmb (我的电话， 充值金额)
     router.get('/other/deposit', controller.other.deposit);
+
+    //模拟的提现接口
+    //phone, rmb (我的电话， 提现金额)
+    router.get('/other/withdraw', controller.other.withdraw);
 
 };

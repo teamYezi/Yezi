@@ -172,7 +172,7 @@ class myController extends Controller{
         let category = query.category; //1全部 2待付款 3已付款
         let result = [];
         if (category == 1){//全部订单， 按下单时间排序
-            const images = await this.app.mysql.query(`select * from orders where buyer_phone = ${inputPhone} order by order_time asc`);
+            const images = await this.app.mysql.query(`select * from orders where buyer_phone = ${inputPhone} order by order_time desc`);
             console.log(images);
             if (images.length > 0) {
                 let order_number = images[0].order_number;
@@ -211,7 +211,7 @@ class myController extends Controller{
         }
 
         if (category == 2){//未付款订单， 按下单时间排序
-            const images = await this.app.mysql.query(`select * from orders where status = 0 and buyer_phone = ${inputPhone} order by order_time asc`);
+            const images = await this.app.mysql.query(`select * from orders where status = 0 and buyer_phone = ${inputPhone} order by order_time desc`);
             if (images.length > 0) {
                 let order_number = images[0].order_number;
                 let index= 0;
@@ -248,7 +248,7 @@ class myController extends Controller{
         }
 
         if (category == 3){//已付款订单，按付款时间排序
-            const images = await this.app.mysql.query(`select * from orders where status = 1 and buyer_phone = ${inputPhone} order by deal_time asc`);
+            const images = await this.app.mysql.query(`select * from orders where status = 1 and buyer_phone = ${inputPhone} order by deal_time desc`);
             if (images.length > 0) {
                 let order_number = images[0].order_number;
                 let index= 0;
