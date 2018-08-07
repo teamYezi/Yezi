@@ -369,8 +369,31 @@ class myController extends Controller{
         const query = this.ctx.query;
         let inputPhone = query.phone;
         let page = query.page;
-        let result = await this.app.mysql.query(`select transaction, balance, time from transaction where phone = ${inputPhone} order by time desc`);
-        result = this.paging(page, result, 10);
+        let data =[];
+        let result = await this.app.mysql.query(`select order_number, transaction, balance, time from transaction where phone = ${inputPhone} order by time desc`);
+        if(result.length>0){
+            for(var i=0; i<result.length; i++){
+                let temp = result[i];
+                if(result[i].order_number==null) {//充值或者提现
+                    if(Number(temp.transaction)>=0){//充值
+                        temp['cate']='充值';
+                        data.push(temp);
+                    }else{//提现
+                        temp['cate']='提现';
+                        data.push(temp);
+                    }
+                }else{//收入或支出
+                    if(Number(temp.transaction)>=0){//收入
+                        temp['cate']='收入';
+                        data.push(temp);
+                    }else{//支出
+                        temp['cate']='支出';
+                        data.push(temp);
+                    }
+                }
+            }
+        }
+        data = this.paging(page, data, 10);
         this.ctx.body = result;
     }
 

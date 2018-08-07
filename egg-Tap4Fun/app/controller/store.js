@@ -164,6 +164,15 @@ class storeController extends Controller {
         this.ctx.body = result;
     }
 
+    //购物车删除商品
+    async rmvcart(){
+        const query = this.ctx.query;
+        let phone = query.phone;
+        let imgID = query.imgID;
+        const rmv = await this.app.mysql.query(`delete from shoppingCart where phone=${phone} and imgID=${imgID}`);
+        this.ctx.body = '删除'+ imgID;
+    }
+
     //购物车结算
     async pay(){
         const query = this.ctx.query;
@@ -191,7 +200,7 @@ class storeController extends Controller {
                 const store_order = await this.app.mysql.insert('orders', order_per_img);
             }
         }
-        this.ctx.body = 1;
+        this.ctx.body = order_number;
     }
 }
 module.exports = storeController;

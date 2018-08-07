@@ -13,7 +13,7 @@ class uploadimgController extends Controller{
         let img_size = query.size;
         let img_resolution = query.resolution;
         let curTime = new Date().getTime();
-        let imgFull = "http://pcf456fjj.bkt.clouddn.com/"+curTime + postfix;
+        let imgFull = curTime + postfix;
         let index1 = postfix.lastIndexOf(".")+1;
         let index2 = postfix.length;
         let img_postfix = (postfix.substring(index1,index2)).toUpperCase();
@@ -50,6 +50,9 @@ class uploadimgController extends Controller{
         console.log(tag_info);
         //存入数据库
         const updatedImgInfo = await this.app.mysql.insert('imgInfo', img);
+        let cur_img_num = (await this.app.mysql.get('userInfo', {id: phone})).imgNum;
+        console.log(cur_img_num);
+        const update_img_num = await this.app.mysql.update('userInfo', {id: phone, imgNum: cur_img_num+1});
         const updatedImg = await this.app.mysql.get('imgInfo', {imgURL: imgFull});
         tag_info['id'] = updatedImg.id;
         const updatedTagInfo = await this.app.mysql.insert('imgTag', tag_info);
@@ -68,13 +71,15 @@ class uploadimgController extends Controller{
         const query=this.ctx.query;
         let phone = query.phone;
         let postfix = query.postfix;
+        let img_id = query.img_id;
         let curTime = new Date().getTime();
-        let rawFull = "http://pctyardz8.bkt.clouddn.com/"+curTime + postfix;
+        let rawFull = curTime + postfix;
         //链接， 时间， 电话
         const img = {
             img_url: rawFull,
             time: curTime,
             phone: phone,
+            img_id: img_id,
         };
         //存入数据库
         const updatedRawInfo = await this.app.mysql.insert('raw_img_info', img);
@@ -82,6 +87,7 @@ class uploadimgController extends Controller{
         const imgReturn = {
             img_url: rawFull,
             time: curTime,
+            img_id: img_id,
         };
         this.ctx.body=imgReturn;
     }

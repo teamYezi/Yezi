@@ -36,12 +36,9 @@ module.exports = app => {
     //id, phone, cmt(图片id+本人电话+评论内容)
     router.get('/addcomment', controller.mainpage.addcomment);
 
-
-    //TODO 首页的搜索 等界面出来
-    //搜索
-    //input
-    //旅拍 单色 冷淡 清新 文艺 色感 瞬间 空气 元气 远方
-    //router.get('/search', controller.mainpage.search);
+    //搜索 (首页和商城一样)
+    //input, page (用户输入的内容+页码)
+    router.get('/search', controller.mainpage.search);
 
     //图片详情
     //id, phone
@@ -67,11 +64,13 @@ module.exports = app => {
     //cate, page (图片类别, 页码)
     router.get('/store/cate', controller.store.cate);
 
-    //TODO： 商城的搜索 等界面
-
     //商城 -> 购物车
     //phone, page (我的电话号, 页码)
     router.get('/store/cart', controller.store.cart);
+
+    //商城 -> 购物车 ->删除商品
+    //phone, imgID
+    router.get('/store/cart/remove', controller.store.rmvcart);
 
     //商城 -> 购物车 -> 结算
     //phone, imgID(我的电话， 要购买的图片的图片id)
@@ -83,8 +82,14 @@ module.exports = app => {
     router.get('/uploadImg',controller.uploadimg.index);
 
     //上传源文件
-    //phone, postfix
+    //phone, postfix, img_id
     router.get('/uploadRaw',controller.uploadimg.raw);
+
+    //TODO 人工审核
+
+    //TODO 上链
+    //
+    // router.get('/uploadImg', );
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
@@ -174,9 +179,12 @@ module.exports = app => {
 
 
     //----------------------------------------其他----------------------------------------------
-    //TODO
-    //模拟的订单支付接口， 钱够直接扣， 不够返回失败信息
+    //模拟的订单支付接口， 钱够直接扣
     //order_number
     router.get('/other/pay', controller.other.index);
+
+    //模拟的充值接口
+    //phone, rmb (我的电话， 充值金额)
+    router.get('/other/deposit', controller.other.deposit);
 
 };

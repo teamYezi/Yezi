@@ -145,6 +145,9 @@ class personInfoController extends Controller{
                 updated_at: curTime
             }
             const newFans = await this.app.mysql.insert('fans', newFansRecord);
+            //增加关注数和对象粉丝数
+            const fo = await this.app.mysql.query(`update userInfo set follower_num =  follower_num + 1 where id = ${selfID}`);
+            const fan = await this.app.mysql.query(`update userInfo set fans_num =  fans_num + 1 where id = ${targetID}`);
 
         }else{//已关注了: 删除关注表和粉丝表
             status = '已关注，即将取关';
@@ -156,6 +159,9 @@ class personInfoController extends Controller{
                 user_id: targetID,
                 follower: selfID
             });
+            //减少关注数和对象粉丝数
+            const fo = await this.app.mysql.query(`update userInfo set follower_num =  follower_num - 1 where id = ${selfID}`);
+            const fan = await this.app.mysql.query(`update userInfo set fans_num =  fans_num - 1 where id = ${targetID}`);
         }
         this.ctx.body = status;
     }

@@ -296,6 +296,30 @@ class mainpageController extends Controller{
         this.ctx.body = result;
 
     }
+
+    //搜索
+    async search(){
+        const query = this.ctx.query;
+        let input = query.input;
+        let page = query.page;
+
+        let user_result = [];
+        //------搜索作者-------
+        //作者名字+作者标签
+        const users = await this.app.mysql.query(` select avatar, name, signature, id from userInfo where name like '%${input}%' or signature like '%${input}%' order by fans_num desc`);
+        user_result = this.paging(page, users, 10);
+
+        //------搜索作品-------
+        let image_result = [];
+        const images = await this.app.mysql.query(`select imgURL, imgName, id from imgInfo where id like '%${input}%' or imgName like '%${input}%' or description like '%${input}%' order by likes desc`);
+        image_result = this.paging(page, images, 10);
+        let data = {
+            "user": user_result,
+            "images": image_result,
+        };
+
+        this.ctx.body = data;
+    }
 }
 
 module.exports = mainpageController;
