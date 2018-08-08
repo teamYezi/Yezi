@@ -82,17 +82,14 @@ module.exports = app => {
     router.get('/uploadImg',controller.uploadimg.index);
 
     //上传源文件
-    //phone, postfix, img_id
+    //phone, postfix, img_id, MD5
     router.get('/uploadRaw',controller.uploadimg.raw);
 
     //TODO 人工审核
 
     //TODO 上链
-    //
-    // router.get('/uploadImg', );
-    //https://github.com/nebulasio/neb.js
-    //https://github.com/nebulasio/neb.js/blob/master/example/node-example.js
-    //https://github.com/nebulasio/wiki/blob/master/tutorials/%5B中文%5D%20Nebulas%20101%20-%2002%20发送交易.md
+    //img_id
+    router.get('/uploadImg/neb', controller.uploadimg.neb);
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息

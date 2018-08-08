@@ -262,13 +262,13 @@ class mainpageController extends Controller{
             const cart = await this.app.mysql.get('shoppingCart', {phone:inputPhone, imgID: id});
             if (cart === null){
                 //加入购物车
-                status = '加入购物车成功';
+                status = 1;//加入购物车成功： 1
                 const add = await this.app.mysql.insert('shoppingCart', {phone: inputPhone, imgID: id});
             }else{
-                status = '购物车已存在此作品，无法加入购物车';
+                status = 2;//购物车已存在此作品，无法加入购物车： 2
             }
         }else{
-            status = '用户已购买， 无法加入购物车';
+            status = 3;//用户已购买， 无法加入购物车： 3
         }
         this.ctx.body = status;
     }

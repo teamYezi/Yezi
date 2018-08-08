@@ -72,6 +72,7 @@ class uploadimgController extends Controller{
         let phone = query.phone;
         let postfix = query.postfix;
         let img_id = query.img_id;
+        let MD5 = query.MD5;
         let curTime = new Date().getTime();
         let rawFull = curTime + postfix;
         //链接， 时间， 电话
@@ -80,6 +81,7 @@ class uploadimgController extends Controller{
             time: curTime,
             phone: phone,
             img_id: img_id,
+            MD5: MD5,
         };
         //存入数据库
         const updatedRawInfo = await this.app.mysql.insert('raw_img_info', img);
@@ -91,6 +93,12 @@ class uploadimgController extends Controller{
         };
         this.ctx.body=imgReturn;
     }
-}
 
+    //上链
+    async neb(){
+        const query = this.ctx.query;
+        let img_id = query.img_id;
+        
+    }
+}
 module.exports = uploadimgController;
