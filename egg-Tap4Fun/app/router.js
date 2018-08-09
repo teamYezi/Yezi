@@ -85,15 +85,13 @@ module.exports = app => {
     //phone, postfix, img_id, MD5
     router.get('/uploadRaw',controller.uploadimg.raw);
 
-    //TODO 人工审核
-
-    //TODO 上链
-    //img_id
-    router.get('/uploadImg/neb', controller.uploadimg.neb);
+    //人工审核
+    //type(0待审核, 1已发布, -1被驳回)
+    router.get('/manualCheck', controller.uploadimg.mc);
 
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
-    //postfix, name, gender, birthday, signature, id
+    //postfix, name, gender, birthday, signature, id, check
     router.get('/personInfo',controller.personInfo.index);
 
     // 获取用户信息---------------*返回此用户所有信息
@@ -179,7 +177,7 @@ module.exports = app => {
 
 
     //----------------------------------------其他----------------------------------------------
-    //模拟的订单支付接口， 钱够直接扣
+    //模拟的订单支付接口, 钱够直接扣, 并给卖家发推送通知
     //order_number
     router.get('/other/pay', controller.other.index);
 
@@ -191,4 +189,6 @@ module.exports = app => {
     //phone, rmb (我的电话， 提现金额)
     router.get('/other/withdraw', controller.other.withdraw);
 
+    //TODO 推送
+    //https://help.aliyun.com/document_detail/34372.html?spm=a2c4g.11186623.6.547.z4MlCT
 };

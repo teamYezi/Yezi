@@ -15,6 +15,7 @@ class personInfoController extends Controller{
         let birthday = query.birthday;
         let signature = query.signature;
         let id = query.id;//手机号
+        let check = query.check;
 
         const preInfo = await this.app.mysql.get('userInfo', {id: id});
 
@@ -22,11 +23,15 @@ class personInfoController extends Controller{
         if(preInfo!=null){
             var curTime = new Date().getTime();
             let avatar = curTime + postfix;
-            let avatarFull = "http://pc9byzxgk.bkt.clouddn.com/"+curTime + postfix;
-            if(postfix=="null"){
-                avatar = null;
-                avatarFull = null;
+            let avatarFull = preInfo.avatar;
+            if(Number(check)!=0){
+                avatarFull = "http://pc9byzxgk.bkt.clouddn.com/"+curTime + postfix;
             }
+            console.log(avatarFull);
+            // if(postfix=="null"){
+            //     avatar = null;
+            //     avatarFull = null;
+            // }
             //昵称， 性别， 生日， 个人标签
             const user = {
                 avatar: avatarFull,
@@ -38,6 +43,7 @@ class personInfoController extends Controller{
             };
             //存入数据库
             const updatedUser = await this.app.mysql.update('userInfo', user);
+
             //返回给前端
             const userReturn = {
                 avatar: avatar,

@@ -4,7 +4,7 @@ const Controller = require('./my');
 
 
 class otherController extends Controller {
-    //订单支付接口  账户余额够直接扣款
+    //订单支付接口  账户余额够直接扣款  并给卖家们发送系统通知
     async index() {
         const query = this.ctx.query;
         let order_number = query.order_number;
@@ -60,6 +60,22 @@ class otherController extends Controller {
                 for(var i=0; i<order.length; i++){
                     let img_id = order[i].imgID;
                     const rmv_from_cart = await this.app.mysql.delete('shoppingCart', {phone:buyer_phone, imgID:img_id});
+                }
+
+                //消息推送
+                const buyer = await this.app.mysql.get('userInfo', {id:buyer_phone});
+                let buyer_name = buyer.name;
+                for(var i=0; i<order.length; i ++){
+                    let seller_phone = order[i].seller_phone;
+                    let img_id = order[i].imgID;
+                    let img_name = (await this.app.mysql.get('imgInfo', {id: img_id})).imgName;//根据图片id找到这张图片的图片名字
+                    let new_messsage = {
+                        type: 2,
+                        time: new Date().getTime(),
+                        content: `${buyer_name}购买了您的"${img_name}", 快去首页查看吧`,
+                        phone: seller_phone,
+                    }
+                    const addtuisong = await this.app.mysql.insert('notification', new_messsage);
                 }
             }else{
                 message = (-3);//余额不足， 订单支付失败

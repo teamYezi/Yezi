@@ -1,7 +1,6 @@
 'use strict';
 
 var Yezi = function(obj) {
-    //序列化
     if (typeof obj === "string") {
         obj = JSON.parse(obj);
     }
@@ -28,7 +27,7 @@ Yezi.prototype = {
     }
 };
 
-//超星日记本智能合约
+//叶子智能合约
 var Yeziapp = function() {
     LocalContractStorage.defineProperties(this, {
         _name: "yezicopyright", //合约名字
@@ -36,8 +35,8 @@ var Yeziapp = function() {
     });
 
     LocalContractStorage.defineMapProperties(this, {
-        //定义日记的Map容器，用来存放每一个数据
-        "diarys": {
+        //定义的Map容器，用来存放每一个数据
+        "yezi": {
             parse: function(value) {
                 return new Diary(value);
             },
@@ -47,24 +46,24 @@ var Yeziapp = function() {
         }
     });
 };
+
 Yeziapp.prototype = {
-    //初始化
     init: function() {
         this._name = "YeziCopyRight of Nebulas";
         this._creator = Blockchain.transaction.from;
     },
-    //添加日记数据
-    addDiaryInfo: function(img_url, time, phone, id, img_id, MD5) {
+    //添加数据
+    addCopyRight: function(img_url, time, phone, id, img_id, MD5) {
         var from = Blockchain.transaction.from;
-        var diaryItem = this.diarys.get(id);
+        var yeziItem = this.yezi.get(id);
 
-        //判断日记是否存在
-        if (diaryItem) {
+        //判断是否存在
+        if (yeziItem) {
             throw new Error("id重复！");
         }
 
-        //新增一个日记数据
-        var diaryItem = new Diary({
+        //新增一个数据
+        var yeziItem = new Diary({
             "img_url": img_url,
             "time": time,
             "phone": phone,
@@ -73,11 +72,14 @@ Yeziapp.prototype = {
             "MD5": MD5,
         });
 
-        this.diarys.put(id, diaryItem);
+        this.yezi.put(id, yeziItem);
     },
     //查看数据
-    getDiaryInfo: function(id) {
-        return 1;
+    getCopyRight: function(id) {
+        if(id === ""){
+            throw new Error("empty id");
+        }
+        return this.yezi.get(id);
     }
 };
 

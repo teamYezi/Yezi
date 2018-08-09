@@ -94,11 +94,55 @@ class uploadimgController extends Controller{
         this.ctx.body=imgReturn;
     }
 
-    //上链
-    async neb(){
+    //人工审核 (图片url raw文件url raw文件发布时间 raw文件MD5 图片id 图片名字 作者电话 作者名字)
+    async mc(){
         const query = this.ctx.query;
-        let img_id = query.img_id;
-        
+        let type = query.type; //(0待审核, 1已发布, -1被驳回)
+        let result = [];
+        const images = await this.app.mysql.query(`select * from imgInfo where status = ${type} order by pubdate asc`);
+        if(images.length>0){
+            for(var i=0; i<images.length; i++){
+                let img_url = images[i].imgURL;
+                let img_id = images[i].id;
+                let img_name = images[i].imgName;
+                let phone = images[i].phone;
+                const author = await this.app.mysql.get('userInfo', {id:phone});
+                let author_name = author.name;
+                const raw = await this.app.mysql.get('raw_img_info', {img_id: img_id});
+                let raw_url = raw.img_url;
+                let MD5 = raw.MD5;
+                let raw_time = raw.time;
+                let data = {
+                    "img_url": img_url,
+                    "raw_url": raw_url,
+                    "raw_time": raw_time,
+                    "MD5": MD5,
+                    "img_id": img_id,
+                    "img_name": img_name,
+                    "phone": phone,
+                    "author_name": author_name,
+                }
+                result.push(data);
+            }
+        }
+        this.ctx.body = result;
     }
+
+    // //上链
+    // //https://mp.weixin.qq.com/s/_cJ1W9fFMAHR7KjwKwg1Gg
+    // //https://zhuanlan.zhihu.com/p/36709518
+    // //https://www.imooc.com/article/29216
+    // async neb(){
+    //     const query = this.ctx.query;
+    //     let img_id = query.img_id;
+    //     var dappAddressFrom = 'n1PNy9Hd7Qb36FcvmNzLnJrBUvVCxyxaYSN';
+    //     var dappAddressTo ="n1PNy9Hd7Qb36FcvmNzLnJrBUvVCxyxaYSN";
+    //     // var nebulas = require("nebulas"),
+    //     //     Account = nebulas.Account,
+    //     //     neb = new nebulas.Neb();
+    //     // neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+    //     //
+    //
+    // }
 }
 module.exports = uploadimgController;
