@@ -80,6 +80,11 @@ class personInfoController extends Controller{
             avatar = targetInfo.avatar;
         }
 
+        //对象用户名
+        let target_name = targetInfo.name;
+        //对象签名
+        let target_sig = targetInfo.signature;
+
         //对象用户的关注人数
         let following = 0;
         const targetFollow = await this.app.mysql.select('follow', {
@@ -120,6 +125,8 @@ class personInfoController extends Controller{
             "fans": fans,
             "followed":followed,
             "imagesInfo": targetimg,
+            "name": target_name,
+            "signature": target_sig,
         };
 
         this.ctx.body=data;

@@ -118,5 +118,24 @@ class otherController extends Controller {
         const result = await this.app.mysql.insert('transaction', new_withdraw);
         this.ctx.body = new_withdraw;
     }
+
+    //给所有用户发系统通知
+    async notification(){
+        const query = this.ctx.query;
+        let message = query.message;
+        const phone = await this.app.mysql.query(`select id from userInfo`);//所有人的电话
+        if(phone!=null){
+            for(var i=0; i<phone.length; i++){
+                let add_notification = {
+                    type: 3,
+                    time: new Date().getTime(),
+                    content: message,
+                    phone: phone[i],
+                };
+                const update_notification = await this.app.mysql.insert('notification', add_notification);
+            }
+        }
+        this.ctx.body = 1;
+    }
 }
 module.exports = otherController;

@@ -7,8 +7,8 @@ const SMSClient = require('@alicloud/sms-sdk');
    1 -----发送成功
    -1 -----已注册
 */
-const accessKeyId = 'LTAIWsNF0xRDTygR'
-const secretAccessKey = 'DNcw97wsNRTYi7UjdYz0vFIOt2R6r9'
+const accessKeyId = 'LTAIU8f2mJaX3HZE'
+const secretAccessKey = 'ygYH04BL2dO7LfLLmtldiRD8T6GurM'
 
 let smsClient = new SMSClient({accessKeyId, secretAccessKey});
 
@@ -35,7 +35,7 @@ class HomeController extends Controller {
           smsClient.sendSMS({
               PhoneNumbers: inputPhone,
               SignName: '余亚希',
-              TemplateCode: 'SMS_139935233',
+              TemplateCode: 'SMS_142075530',
               TemplateParam: `{"code":${code}}`
           }).then(function (res) {
               let {Code}=res
@@ -64,8 +64,6 @@ class HomeController extends Controller {
               const result1 = await this.app.mysql.update('authCode', user);
           }
       }
-
-
     this.ctx.body = status;
   }
 
@@ -93,6 +91,14 @@ class HomeController extends Controller {
                         imgNum: 0,
                     };
                     const newUser = await this.app.mysql.insert('userInfo', user);
+                    //生成初始钱包
+                    let trans = {
+                        phone: phone,
+                        transaction: 0,
+                        balance: 0,
+                        time: new Date().getTime(),
+                    }
+                    const new_trans = await this.app.mysql.insert('transaction', trans);
                 }
             }else{//验证码过期了
                 stateCode = -1;

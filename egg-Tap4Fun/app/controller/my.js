@@ -60,7 +60,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let publishedImg = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${phone} and status = 1`);
-        publishedImg = this.paging(page, publishedImg, 15);
+        publishedImg = this.paging(page, publishedImg, 100);
         this.ctx.body=publishedImg;
     }
 
@@ -70,7 +70,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let pendingImg = await this.app.mysql.query(`select imgURL, id from imgInfo where phone = ${phone} and status = 0`);
-        pendingImg = this.paging(page, pendingImg, 15);
+        pendingImg = this.paging(page, pendingImg, 100);
         this.ctx.body=pendingImg;
     }
 
@@ -80,7 +80,7 @@ class myController extends Controller{
         let phone = query.phone;
         let page = query.page;
         let followedUser = await this.app.mysql.query(`select avatar, name, signature, id from userInfo where id in (select followed_user from follow where user_id = ${phone})`);
-        followedUser = this.paging(page, followedUser, 30);
+        followedUser = this.paging(page, followedUser, 100);
         this.ctx.body = followedUser;
     }
 
@@ -99,7 +99,7 @@ class myController extends Controller{
                 }
             }
         }
-        result = this.paging(page, result, 30);
+        result = this.paging(page, result, 100);
         this.ctx.body = result;
     }
 

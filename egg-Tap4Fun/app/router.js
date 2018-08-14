@@ -38,7 +38,7 @@ module.exports = app => {
 
     //搜索 (首页和商城一样)
     //input, page (用户输入的内容+页码)
-    router.get('/search', controller.mainpage.search);
+    router.get('/search', controller.mainpage.searchAll);
 
     //图片详情
     //id, phone
@@ -56,6 +56,26 @@ module.exports = app => {
     //id, page(图片id+页码)
     router.get('/imgDetail/comments', controller.mainpage.comments);
 
+    //他人用户信息界面
+    //selfID, targetID, page (15张作品为一页)
+    router.get('/userpage',controller.personInfo.userpage);
+
+    //他人的关注
+    //selfID, targetID, page
+    router.get('/other/follow', controller.mainpage.targetFollow);
+
+    //他人的粉丝
+    //selfID, targetID, page
+    router.get('/other/fans', controller.mainpage.targetFans);
+
+    //搜索他人关注
+    //selfID, targetID, page, input
+    router.get('/other/follow/search', controller.mainpage.targetFollowSearch);
+
+    //搜索他人粉丝
+    //selfID, targetID, page, input
+    router.get('/other/fans/search', controller.mainpage.targetFansSearch);
+
     //------------------------------------------首页发现------------------------------------------------
     //商城首页
     router.get('/store', controller.store.index);
@@ -72,13 +92,14 @@ module.exports = app => {
     //phone, imgID
     router.get('/store/cart/remove', controller.store.rmvcart);
 
+    //TODO
     //商城 -> 购物车 -> 结算
     //phone, imgID(我的电话， 要购买的图片的图片id)
     router.get('/store/pay', controller.store.pay);
 
     //------------------------------------------版权上传------------------------------------------------
     //上传作品图, 并且编辑资料
-    //phone, price, imgName, postfix, size, resolution, description, imgTag, ctag
+    //phone, price, imgName, postfix, size, resolution, description, imgTag, ctag, forsale(1上架0不上架)
     router.get('/uploadImg',controller.uploadimg.index);
 
     //上传源文件
@@ -89,6 +110,11 @@ module.exports = app => {
     //type(0待审核, 1已发布, -1被驳回)
     router.get('/manualCheck', controller.uploadimg.mc);
 
+    //人工审核（通过或者驳回） 通过后向用户发布信息
+    //img_id, type(1通过, -1驳回)
+    router.get('/doManualCheck', controller.uploadimg.dmc);
+
+
     //--------------------------------------------我的--------------------------------------------------
     //更改自己的用户信息
     //postfix, name, gender, birthday, signature, id, check
@@ -97,10 +123,6 @@ module.exports = app => {
     // 获取用户信息---------------*返回此用户所有信息
     //phone
     router.get('/getpersonInfo',controller.personInfo.getInfo);
-
-    //他人用户信息界面
-    //selfID, targetID, page (15张作品为一页)
-    router.get('/userpage',controller.personInfo.userpage);
 
     //我的主界面
     //返回我的头像， 名字， 签名， 作品数， 关注的人数， 粉丝的人数
@@ -177,6 +199,7 @@ module.exports = app => {
 
 
     //----------------------------------------其他----------------------------------------------
+    //TODO
     //模拟的订单支付接口, 钱够直接扣, 并给卖家发推送通知
     //order_number
     router.get('/other/pay', controller.other.index);
@@ -189,6 +212,8 @@ module.exports = app => {
     //phone, rmb (我的电话， 提现金额)
     router.get('/other/withdraw', controller.other.withdraw);
 
-    //TODO 推送
-    //https://help.aliyun.com/document_detail/34372.html?spm=a2c4g.11186623.6.547.z4MlCT
+    //TODO， 要在审核的网站加这个
+    //给用户发推送通知的接口
+    //message
+    router.get('/other/notification', controller.other.notification);
 };

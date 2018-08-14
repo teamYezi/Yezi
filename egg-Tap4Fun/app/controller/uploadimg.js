@@ -13,13 +13,15 @@ class uploadimgController extends Controller{
         let img_size = query.size;
         let img_resolution = query.resolution;
         let curTime = new Date().getTime();
-        let imgFull = curTime + postfix;
+        let imgFull = 'http://pc99io518.bkt.clouddn.com/' + curTime + postfix;
+        let img_return = curTime + postfix;
         let index1 = postfix.lastIndexOf(".")+1;
         let index2 = postfix.length;
         let img_postfix = (postfix.substring(index1,index2)).toUpperCase();
         let price = query.price;
         let imgName = query.imgName;
         let description = query.description;
+        let forsale = query.forsale;
         //链接， 时间， 电话
         const img = {
             phone: phone,
@@ -31,6 +33,7 @@ class uploadimgController extends Controller{
             size: img_size,
             postfix: img_postfix,
             resolution: img_resolution,
+            forsale: forsale,
         };
         let imgTag = query.imgTag;
         let ctag = query.ctag; //自定义的标签
@@ -59,7 +62,7 @@ class uploadimgController extends Controller{
 
         //返回给前端
         const imgReturn = {
-            img_url: imgFull,
+            img_url: img_return,
             time: curTime,
             img_id: updatedImg.id,
         };
@@ -94,7 +97,7 @@ class uploadimgController extends Controller{
         this.ctx.body=imgReturn;
     }
 
-    //人工审核 (图片url raw文件url raw文件发布时间 raw文件MD5 图片id 图片名字 作者电话 作者名字)
+    //人工审核
     async mc(){
         const query = this.ctx.query;
         let type = query.type; //(0待审核, 1已发布, -1被驳回)
@@ -109,40 +112,63 @@ class uploadimgController extends Controller{
                 const author = await this.app.mysql.get('userInfo', {id:phone});
                 let author_name = author.name;
                 const raw = await this.app.mysql.get('raw_img_info', {img_id: img_id});
-                let raw_url = raw.img_url;
-                let MD5 = raw.MD5;
-                let raw_time = raw.time;
-                let data = {
-                    "img_url": img_url,
-                    "raw_url": raw_url,
-                    "raw_time": raw_time,
-                    "MD5": MD5,
-                    "img_id": img_id,
-                    "img_name": img_name,
-                    "phone": phone,
-                    "author_name": author_name,
+                if(raw!=null){
+                    let raw_url = 'http://pctyardz8.bkt.clouddn.com/'+raw.img_url;
+                    let MD5 = raw.MD5;
+                    let raw_time = raw.time;
+                    let data = {
+                        "id":raw.id,
+                        "img_url": img_url,
+                        "raw_url": raw_url,
+                        "raw_time": raw_time,
+                        "MD5": MD5,
+                        "img_id": img_id,
+                        "img_name": img_name,
+                        "phone": phone,
+                        "author_name": author_name,
+                    };
+                    console.log(img_url);
+                    console.log(raw_url);
+                    result.push(data);
                 }
-                result.push(data);
             }
         }
         this.ctx.body = result;
     }
 
-    // //上链
-    // //https://mp.weixin.qq.com/s/_cJ1W9fFMAHR7KjwKwg1Gg
-    // //https://zhuanlan.zhihu.com/p/36709518
-    // //https://www.imooc.com/article/29216
-    // async neb(){
-    //     const query = this.ctx.query;
-    //     let img_id = query.img_id;
-    //     var dappAddressFrom = 'n1PNy9Hd7Qb36FcvmNzLnJrBUvVCxyxaYSN';
-    //     var dappAddressTo ="n1PNy9Hd7Qb36FcvmNzLnJrBUvVCxyxaYSN";
-    //     // var nebulas = require("nebulas"),
-    //     //     Account = nebulas.Account,
-    //     //     neb = new nebulas.Neb();
-    //     // neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
-    //     //
-    //
-    // }
+    //人工审核 （1通过 -1驳回）
+    async dmc(){
+        const query = this.ctx.query;
+        let type = query.type;
+        let img_id = query.img_id;
+        const update = await this.app.mysql.update('imgInfo', {id:img_id, status: type});
+        const img_info = await this.app.mysql.get('imgInfo', {id: img_id});
+        //如果审核通过， 给用户发通知
+        if(Number(type) == 1){
+            let phone = img_info.phone;
+            let add_notification = {
+                type: 1,
+                time: new Date().getTime(),
+                content: "管理员通过了您发布的原创作品， 快去首页查看吧",
+                phone: phone,
+            };
+            const update_notification = await this.app.mysql.insert('notification', add_notification);
+        }else{
+            //如果审核未通过， 作品数-1, 给用户发通知
+            let phone = img_info.phone;
+            let cur_img_num = (await this.app.mysql.get('userInfo', {id: phone})).imgNum;
+            const update_img_num = await this.app.mysql.update('userInfo', {id: phone, imgNum: cur_img_num-1});
+            let img_name = img_info.imgName;
+            let add_notification = {
+                type: 1,
+                time: new Date().getTime(),
+                content: `非常抱歉， 您的作品${img_name}没有通过审核`,
+                phone: phone,
+            };
+            const update_notification = await this.app.mysql.insert('notification', add_notification);
+
+        }
+        this.ctx.body =update;
+    }
 }
 module.exports = uploadimgController;

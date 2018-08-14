@@ -38,7 +38,7 @@ var Yeziapp = function() {
         //定义的Map容器，用来存放每一个数据
         "yezi": {
             parse: function(value) {
-                return new Diary(value);
+                return new Yezi(value);
             },
             stringify: function(o) {
                 return o.toString();
@@ -63,7 +63,7 @@ Yeziapp.prototype = {
         }
 
         //新增一个数据
-        var yeziItem = new Diary({
+        var yeziItem = new Yezi({
             "img_url": img_url,
             "time": time,
             "phone": phone,
@@ -73,6 +73,7 @@ Yeziapp.prototype = {
         });
 
         this.yezi.put(id, yeziItem);
+        return 1;
     },
     //查看数据
     getCopyRight: function(id) {
