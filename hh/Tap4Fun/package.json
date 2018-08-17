@@ -1,0 +1,67 @@
+{
+  "name": "Tap4Fun",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "bundle-ios": "    node node_modules/react-native/local-cli/cli.js bundle --entry-file index.js     --platform ios     --dev false --bundle-output ./ios/bundle/main.jsbundle                         --assets-dest ./ios/bundle",
+    "bundle-android": "node node_modules/react-native/local-cli/cli.js bundle --entry-file index.js --platform android --dev false --bundle-output ./android/app/src/main/bundle/index.android.bundle --assets-dest ./android/app/src/main/bundle",
+    "postinstall": [
+      "echo yarn install finish... ; echo ,,",
+      "; remotedev-debugger --hostname localhost --port 5678 --injectserver ; echo ,,",
+      "; echo yarn post install script finish..."
+    ],
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "deepmerge": "^2.0.1",
+    "moment": "^2.22.2",
+    "native-base": "^2.7.2",
+    "node-forge": "^0.7.5",
+    "prop-types": "^15.6.0",
+    "qiniu": "^7.2.1",
+    "querystring": "^0.2.0",
+    "ramda": "^0.25.0",
+    "react": "16.2.0",
+    "react-native": "0.52.0",
+    "react-native-actionsheet": "^2.4.2",
+    "react-native-code-push": "^5.4.0",
+    "react-native-datepicker": "^1.7.2",
+    "react-native-datetime": "^0.1.2",
+    "react-native-drawer": "^2.5.0",
+    "react-native-hardskilled-double-tap": "^1.0.0",
+    "react-native-image-crop-picker": "^0.20.3",
+    "react-native-image-zoom-viewer": "^2.2.13",
+    "react-native-parallax-scroll-view": "^0.21.3",
+    "react-native-parallax-view": "^2.0.6",
+    "react-native-picker": "^4.3.7",
+    "react-native-qiniu": "^0.3.0",
+    "react-native-root-siblings": "^3.0.0",
+    "react-native-root-toast": "^3.0.1",
+    "react-native-scrollable-tab-view": "^0.8.0",
+    "react-native-side-menu": "^1.1.3",
+    "react-native-swiper": "^1.5.13",
+    "react-native-textinput-effects": "^0.4.2",
+    "react-native-vector-icons": "^4.6.0",
+    "react-navigation": "^1.0.0-beta.27",
+    "react-navigation-redux-helpers": "^1.0.7",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-actions": "^2.2.1",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^0.16.0"
+  },
+  "devDependencies": {
+    "babel-jest": "22.1.0",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "22.1.1",
+    "react-devtools": "^3.0.0",
+    "react-test-renderer": "16.2.0",
+    "remote-redux-devtools": "^0.5.12",
+    "remote-redux-devtools-on-debugger": "^0.8.3"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
