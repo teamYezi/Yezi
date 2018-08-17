@@ -162,7 +162,7 @@ class uploadimgController extends Controller{
             let add_notification = {
                 type: 1,
                 time: new Date().getTime(),
-                content: `非常抱歉， 您的作品${img_name}没有通过审核`,
+                content: `非常抱歉， 您的作品《${img_name}》没有通过审核`,
                 phone: phone,
             };
             const update_notification = await this.app.mysql.insert('notification', add_notification);

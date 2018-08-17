@@ -84,6 +84,10 @@ module.exports = app => {
     //cate, page (图片类别, 页码)
     router.get('/store/cate', controller.store.cate);
 
+    //搜索 (商城分类的搜索)
+    //cate, input(图片类别, 用户输入的内容)
+    router.get('/store/cate/search', controller.store.cateSearch);
+
     //商城 -> 购物车
     //phone, page (我的电话号, 页码)
     router.get('/store/cart', controller.store.cart);

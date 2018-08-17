@@ -337,10 +337,12 @@ class myController extends Controller{
         let page  = query.page;
         let result = [];
         let all = await this.app.mysql.query(`select * from likes where phone = ${inputPhone} order by time desc`);
+        // console.log(all);
         if(all.length>0){
             for(var i=0; i<all.length; i++){
-                let img_info = await this.app.mysql.query(`select * from imgInfo where id = ${all[i].imgLikesID}`);
-                let user_phone = (await this.app.mysql.get('imgInfo', {id: all[i].imgLikesID})).phone;
+                console.log(all[i].imgLikesID);
+                let img_info = await this.app.mysql.query(`select * from imgInfo where id = ${all[i].imgLikesID}`);//我点赞的图片的id
+                let user_phone = (await this.app.mysql.get('imgInfo', {id: all[i].imgLikesID})).phone;//图片所属人的电话
                 let user = await this.app.mysql.get('userInfo', {id: user_phone});
                 let img = {
                     "name":user.name,
@@ -408,7 +410,7 @@ class myController extends Controller{
             for(var i=0; i<all.length; i++){
                 const user = await this.app.mysql.get('userInfo', {id: all[i].phone});
                 const image = await this.app.mysql.get('imgInfo', {id: all[i].imgLikesID});
-                console.log(image);
+                // console.log(image);
                 let info = {
                     "user_name": user.name,
                     "user_avatar": user.avatar,

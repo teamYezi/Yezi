@@ -12,13 +12,20 @@ function build_order_no(){
     return outTradeNo;
 }
 
+function isContains(str, substr){
+    let s1 = str.toString();
+    let s2 = substr.toString();
+    // console.log("12345".indexOf("123")+"aaa");
+    return s1.indexOf(s2)>=0;
+}
+
 class storeController extends Controller {
     //商城首页
     async index() {
         let result = [];
         //广告信息
         let ads = {
-            "ads":["http://pcenv09jq.bkt.clouddn.com/ad1.png", "http://pcenv09jq.bkt.clouddn.com/ad2.png", "http://pcenv09jq.bkt.clouddn.com/ad3.png"],
+            "ads":["http://pcenv09jq.bkt.clouddn.com/a1.jpg", "http://pcenv09jq.bkt.clouddn.com/a2new.jpeg", "http://pcenv09jq.bkt.clouddn.com/a3.jpg"],
         };
         result[0] = ads;
 
@@ -139,6 +146,55 @@ class storeController extends Controller {
         }
 
         result = this.paging(page, result, 100);
+        this.ctx.body = result;
+    }
+
+    //商城分类的搜索
+    async cateSearch(){
+        const query = this.ctx.query;
+        let cate = query.cate;
+        let input = query.input;
+
+
+        //先搜索出类别下所有图片
+        let result = [];
+        const all = await this.app.mysql.query(`select id from imgTag where ${cate} = 1`);
+        for (var i =0; i< all.length; i++){
+            let id = all[i].id;
+            let image = await this.app.mysql.get('imgInfo', {id: id});
+            if (image === null){//如果标签存在图片却不存在
+                this.ctx.body = `ERROR: 图片不存在， id：${id}`;
+                return;
+            }else{
+                if ((Number(image.status)===1)&&(Number(image.forsale)===1)){//确保图片已上架并且审核通过
+                    //图片url
+                    let url = image.imgURL;
+                    //图片名字
+                    let img_name = image.imgName;
+                    //作者名字
+                    let auth_name = (await this.app.mysql.get('userInfo', {id: image.phone})).name;
+                    //图片价格
+                    let price = image.price;
+
+                    //判断图片信息是否符合搜索条件
+                    let check_id = isContains(image.id, input);//图片ID
+                    let check_name = isContains(img_name, input);//图片名字
+                    let check_description = isContains(image.description, input);
+                    if((check_id == true)||(check_name==true)||(check_description==true)){
+                        let imageInfo = {
+                            "imgID": image.id,
+                            "imgURL": url,
+                            "imgName": img_name,
+                            "author_name": auth_name,
+                            "price": price,
+                            "description": image.description,
+                        };
+                        result.push(imageInfo);
+                    }
+                }
+            }
+        }
+
         this.ctx.body = result;
     }
 

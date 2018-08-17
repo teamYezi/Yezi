@@ -14,7 +14,7 @@ let smsClient = new SMSClient({accessKeyId, secretAccessKey});
 
 class HomeController extends Controller {
     async index() {
-      let status=1
+      let status=1;
       //读取用户手机号
       const query=this.ctx.query;
       let inputPhone=query.phone;

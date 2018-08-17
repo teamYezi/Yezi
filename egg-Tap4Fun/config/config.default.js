@@ -8,6 +8,7 @@ module.exports = appInfo => {
             port: '3306',
             user: 'root',
             password: '11111111',
+            //Yezi123123!
             database: 'Tap4fun',
         },
         app: true,

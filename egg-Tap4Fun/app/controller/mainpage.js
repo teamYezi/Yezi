@@ -135,7 +135,7 @@ class mainpageController extends Controller{
         //图片名字
         let imgName = img.imgName;
         //图片id
-        let fid = padding(id, 5);
+        let fid = id;
         //图片标签
         let tags = await this.app.mysql.query(`select * from imgTag where id = ${id}`);
         let data=[];
@@ -171,8 +171,7 @@ class mainpageController extends Controller{
         let imgSize = img.size;
         //图片分辨率
         let imgResolution = img.resolution;
-        //是否已上架
-        let forsale = img.forsale;
+
 
         //3条以内评论（评论人名字，头像URL， 评论发布日期， 评论内容 ）
         let cmts = [];
@@ -204,6 +203,22 @@ class mainpageController extends Controller{
         //本人头像
         const myAvatar = (await this.app.mysql.get('userInfo', {id: inputphone})).avatar;
 
+        //作品状态
+        let status = 1;//可以加入购物车
+        if(img.forsale==0){
+            status = 2;//作品未上架
+        }
+        if(img.phone==inputphone){
+            status = 3;//是自己的作品
+        }
+        const cart = await this.app.mysql.get('shoppingCart', {phone:inputphone, imgID: id});
+        if(cart!=null){
+            status = 4;//购物车已有此作品
+        }
+        const purchased = await this.app.mysql.get('orders', {imgID: id, buyer_phone: inputphone, status: 1});
+        if(purchased!=null){
+            status =5;//已购买
+        }
         let result = {
             "imgURL": imgURL,
             "imgName": imgName,
@@ -220,21 +235,20 @@ class mainpageController extends Controller{
             "signature": authorSig,
             "image_size": imgSize,
             "image_resolution": imgResolution,
-            "forsale": forsale,
             "image_type": imgType,
             "comments": cmts,
             "my_avatar": myAvatar,
             "likedornot":likedornot,
+            "status": status,
         };
         this.ctx.body = result;
 
-
-        function padding(num, length) {
-            for(var len = (num + "").length; len < length; len = num.length) {
-                num = "0" + num;
-            }
-            return num;
-        }
+        // function padding(num, length) {
+        //     for(var len = (num + "").length; len < length; len = num.length) {
+        //         num = "0" + num;
+        //     }
+        //     return num;
+        // }
     }
 
     //图片详情->立即购买 （如果此作品已经购买过或者是自己的作品则不能立即购买）
@@ -343,17 +357,15 @@ class mainpageController extends Controller{
         //------搜索作者-------
         //作者名字+作者标签
         const users = await this.app.mysql.query(` select avatar, name, signature, id from userInfo where name like '%${input}%' or signature like '%${input}%' order by fans_num desc`);
-        let user_page_num = Math.ceil(users.length/10);
-        user_result = this.paging(page, users, 10);
+        user_result = this.paging(page, users, 100);
 
         //------搜索作品-------
         //图片名字， 图片id， 图片描述（按点赞排序）
         let image_result = [];
-        const images = await this.app.mysql.query(`select imgURL, imgName, id, forsale from imgInfo where id like '%${input}%' or imgName like '%${input}%' or description like '%${input}%' order by likes desc`);
+        const images = await this.app.mysql.query(`select imgURL, imgName, id, forsale from imgInfo where (id like '%${input}%' or imgName like '%${input}%' or description like '%${input}%') and status=1 order by likes desc`);
         image_result = this.paging(page, images, 100);
         let data = {
             "user": user_result,
-            "user_page_num": user_page_num,
             "images": image_result,
         };
 
