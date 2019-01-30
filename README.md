@@ -9,7 +9,7 @@
 :girl: Back-end Developer: Chloe   
 
 ----
-**Stack:**
+**Built With:**  
 Front-end: React.js, React  
 Back-end: Node.js  
 Block Chain: [nebulas ](https://nebulas.io/)    
