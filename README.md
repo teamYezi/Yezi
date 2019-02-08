@@ -10,7 +10,7 @@
 
 ----
 **Built With:**  
-Front-end: React.js, React Native
+Front-end: React.js, React Native 
 Back-end: Node.js  
 Block Chain: [nebulas ](https://nebulas.io/)    
 Database: Mysql   
